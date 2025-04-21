@@ -1,18 +1,11 @@
-# sv
+# In-House Match History
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+This project is a web application for tracking and displaying a log of League of Legends in-house matches. As these are custom matches, there is no great other way to track them via mainstream tracking websites.
 
-## Creating a project
+- List and search all recorded matches
+- Upload new ones
+- Edit uploaded ones
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
-```
 
 ## Developing
 
