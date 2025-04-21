@@ -70,132 +70,130 @@
     };
 </script>
 
-<div class="p-4 bg-gray-100 rounded-lg shadow-md">
-    <div class="grid grid-cols-2 gap-0">
-        <!-- Blue Team -->
-        <div class="bg-blue-50 p-2 rounded-md shadow-sm">
-            <table class="table-auto w-full text-xs text-left">
-                <thead>
-                    <tr class="bg-blue-200 text-gray-700 font-semibold">
-                        <th colspan="6" class="px-2 py-1">
-                            {getMatchWinner("100") ? 'Victory' : 'Defeat'} | {gameLengthFormatted}
-                        </th>
-                    </tr>
-                    <tr class="bg-blue-100 text-gray-500 font-medium">
-                        <th class="px-2 py-1">Player</th>
-                        <th class="px-2 py-1">K/D/A</th>
-                        <th class="px-2 py-1">Gold</th>
-                        <th class="px-2 py-1">Damage</th>
-                        <th class="px-2 py-1">Wards</th>
-                        <th class="px-2 py-1">CS</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {#each ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as position}
-                    {#each match.statsJson.filter(player => player.TEAM === "100" && player.TEAM_POSITION === position) as player}
-                        <tr class="border-b">
-                            <td class="px-2 py-1 flex items-center">
+<div class="grid grid-cols-2 gap-0">
+    <!-- Blue Team -->
+    <div class="bg-blue-50 p-2 rounded-md shadow-sm">
+        <table class="table-auto w-full text-xs text-left">
+            <thead>
+                <tr class="bg-blue-200 text-gray-700 font-semibold">
+                    <th colspan="6" class="px-2 py-1">
+                        {getMatchWinner("100") ? 'Victory' : 'Defeat'} | {gameLengthFormatted}
+                    </th>
+                </tr>
+                <tr class="bg-blue-100 text-gray-500 font-medium">
+                    <th class="px-2 py-1">Player</th>
+                    <th class="px-2 py-1">K/D/A</th>
+                    <th class="px-2 py-1">Gold</th>
+                    <th class="px-2 py-1">Damage</th>
+                    <th class="px-2 py-1">Wards</th>
+                    <th class="px-2 py-1">CS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {#each ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as position}
+                {#each match.statsJson.filter(player => player.TEAM === "100" && player.TEAM_POSITION === position) as player}
+                    <tr class="border-b">
+                        <td class="px-2 py-1 flex items-center">
+                            <img
+                                class="w-6 h-6 rounded-sm mr-2"
+                                src={getChampionImage(player.SKIN)}
+                                alt="{player.SKIN}"
+                            />
+                            <div class="flex items-center">
                                 <img
-                                    class="w-6 h-6 rounded-sm mr-2"
-                                    src={getChampionImage(player.SKIN)}
-                                    alt="{player.SKIN}"
+                                    class="w-5 h-5"
+                                    style="margin-bottom: 1px;"
+                                    src={getSummonerSpellImage(player.SUMMONER_SPELL_1)}
+                                    alt="Summoner Spell 1"
                                 />
-                                <div class="flex items-center">
-                                    <img
-                                        class="w-5 h-5"
-                                        style="margin-bottom: 1px;"
-                                        src={getSummonerSpellImage(player.SUMMONER_SPELL_1)}
-                                        alt="Summoner Spell 1"
-                                    />
-                                    <img
-                                        class="w-5 h-5 mr-2"
-                                        src={getSummonerSpellImage(player.SUMMONER_SPELL_2)}
-                                        alt="Summoner Spell 2"
-                                    />
-                                    <span class="font-medium text-gray-700 truncate">{player.RIOT_ID_GAME_NAME || player.NAME}</span>
-                                </div>
-                            </td>
-                            <td class="px-2 py-1 text-gray-600">{player.CHAMPIONS_KILLED}/{player.NUM_DEATHS}/{player.ASSISTS}</td>
-                            <td class="px-2 py-1 text-gray-600">{formatGold(player.GOLD_EARNED)}</td>
-                            <td class="px-2 py-1 text-gray-600">
-                                {player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS}
-                                <div class="relative w-full h-1 bg-gray-200 rounded mt-1">
-                                    <div
-                                        class="absolute top-0 left-0 h-full bg-blue-500 rounded"
-                                        style="width: {Math.round((player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS / Math.max(...match.statsJson.map(p => p.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS))) * 100)}%;"
-                                    ></div>
-                                </div>
-                            </td>
-                            <td class="px-2 py-1 text-gray-600">{player.WARD_PLACED} / {player.WARD_KILLED} / {player.VISION_WARDS_BOUGHT_IN_GAME}</td>
-                            <td class="px-2 py-1 text-gray-600">{formatCs(player)}</td>
-                        </tr>
-                    {/each}
-                    {/each}
-                </tbody>
-            </table>
-        </div>
+                                <img
+                                    class="w-5 h-5 mr-2"
+                                    src={getSummonerSpellImage(player.SUMMONER_SPELL_2)}
+                                    alt="Summoner Spell 2"
+                                />
+                                <span class="font-medium text-gray-700 truncate">{player.RIOT_ID_GAME_NAME || player.NAME}</span>
+                            </div>
+                        </td>
+                        <td class="px-2 py-1 text-gray-600">{player.CHAMPIONS_KILLED}/{player.NUM_DEATHS}/{player.ASSISTS}</td>
+                        <td class="px-2 py-1 text-gray-600">{formatGold(player.GOLD_EARNED)}</td>
+                        <td class="px-2 py-1 text-gray-600">
+                            {player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS}
+                            <div class="relative w-full h-1 bg-gray-200 rounded mt-1">
+                                <div
+                                    class="absolute top-0 left-0 h-full bg-blue-500 rounded"
+                                    style="width: {Math.round((player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS / Math.max(...match.statsJson.map(p => p.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS))) * 100)}%;"
+                                ></div>
+                            </div>
+                        </td>
+                        <td class="px-2 py-1 text-gray-600">{player.WARD_PLACED} / {player.WARD_KILLED} / {player.VISION_WARDS_BOUGHT_IN_GAME}</td>
+                        <td class="px-2 py-1 text-gray-600">{formatCs(player)}</td>
+                    </tr>
+                {/each}
+                {/each}
+            </tbody>
+        </table>
+    </div>
 
-        <!-- Red Team -->
-        <div class="bg-red-50 p-2 rounded-md shadow-sm">
-            <table class="table-auto w-full text-xs text-left">
-                <thead>
-                    <tr class="bg-red-200 text-gray-700 font-semibold">
-                        <th colspan="6" class="px-2 py-1">
-                            {getMatchWinner("200") ? 'Victory' : 'Defeat'} | {gameLengthFormatted}
-                        </th>
-                    </tr>
-                    <tr class="bg-red-100 text-gray-500 font-medium">
-                        <th class="px-2 py-1">Player</th>
-                        <th class="px-2 py-1">K/D/A</th>
-                        <th class="px-2 py-1">Gold</th>
-                        <th class="px-2 py-1">Damage</th>
-                        <th class="px-2 py-1">Wards</th>
-                        <th class="px-2 py-1">CS</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {#each ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as position}
-                    {#each match.statsJson.filter(player => player.TEAM === "200" && player.TEAM_POSITION === position) as player}
-                        <tr class="border-b">
-                            <td class="px-2 py-1 flex items-center">
+    <!-- Red Team -->
+    <div class="bg-red-50 p-2 rounded-md shadow-sm">
+        <table class="table-auto w-full text-xs text-left">
+            <thead>
+                <tr class="bg-red-200 text-gray-700 font-semibold">
+                    <th colspan="6" class="px-2 py-1">
+                        {getMatchWinner("200") ? 'Victory' : 'Defeat'} | {gameLengthFormatted}
+                    </th>
+                </tr>
+                <tr class="bg-red-100 text-gray-500 font-medium">
+                    <th class="px-2 py-1">Player</th>
+                    <th class="px-2 py-1">K/D/A</th>
+                    <th class="px-2 py-1">Gold</th>
+                    <th class="px-2 py-1">Damage</th>
+                    <th class="px-2 py-1">Wards</th>
+                    <th class="px-2 py-1">CS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {#each ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as position}
+                {#each match.statsJson.filter(player => player.TEAM === "200" && player.TEAM_POSITION === position) as player}
+                    <tr class="border-b">
+                        <td class="px-2 py-1 flex items-center">
+                            <img
+                                class="w-6 h-6 rounded-sm mr-2"
+                                src={getChampionImage(player.SKIN)}
+                                alt="{player.SKIN}"
+                            />
+                            <div class="flex items-center">
                                 <img
-                                    class="w-6 h-6 rounded-sm mr-2"
-                                    src={getChampionImage(player.SKIN)}
-                                    alt="{player.SKIN}"
+                                    class="w-5 h-5"
+                                    style="margin-bottom: 1px;"
+                                    src={getSummonerSpellImage(player.SUMMONER_SPELL_1)}
+                                    alt="Summoner Spell 1"
                                 />
-                                <div class="flex items-center">
-                                    <img
-                                        class="w-5 h-5"
-                                        style="margin-bottom: 1px;"
-                                        src={getSummonerSpellImage(player.SUMMONER_SPELL_1)}
-                                        alt="Summoner Spell 1"
-                                    />
-                                    <img
-                                        class="w-5 h-5 mr-2"
-                                        src={getSummonerSpellImage(player.SUMMONER_SPELL_2)}
-                                        alt="Summoner Spell 2"
-                                    />
-                                    <span class="font-medium text-gray-700 truncate">{player.RIOT_ID_GAME_NAME || player.NAME}</span>
-                                </div>
-                            </td>
-                            <td class="px-2 py-1 text-gray-600">{player.CHAMPIONS_KILLED}/{player.NUM_DEATHS}/{player.ASSISTS}</td>
-                            <td class="px-2 py-1 text-gray-600">{formatGold(player.GOLD_EARNED)}</td>
-                            <td class="px-2 py-1 text-gray-600">
-                                {player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS}
-                                <div class="relative w-full h-1 bg-gray-200 rounded mt-1">
-                                    <div
-                                        class="absolute top-0 left-0 h-full bg-red-500 rounded"
-                                        style="width: {Math.round((player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS / Math.max(...match.statsJson.map(p => p.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS))) * 100)}%;"
-                                    ></div>
-                                </div>
-                            </td>
-                            <td class="px-2 py-1 text-gray-600">{player.WARD_PLACED} / {player.WARD_KILLED} / {player.VISION_WARDS_BOUGHT_IN_GAME}</td>
-                            <td class="px-2 py-1 text-gray-600">{formatCs(player)}</td>
-                        </tr>
-                    {/each}
-                    {/each}
-                </tbody>
-            </table>
-        </div>
+                                <img
+                                    class="w-5 h-5 mr-2"
+                                    src={getSummonerSpellImage(player.SUMMONER_SPELL_2)}
+                                    alt="Summoner Spell 2"
+                                />
+                                <span class="font-medium text-gray-700 truncate">{player.RIOT_ID_GAME_NAME || player.NAME}</span>
+                            </div>
+                        </td>
+                        <td class="px-2 py-1 text-gray-600">{player.CHAMPIONS_KILLED}/{player.NUM_DEATHS}/{player.ASSISTS}</td>
+                        <td class="px-2 py-1 text-gray-600">{formatGold(player.GOLD_EARNED)}</td>
+                        <td class="px-2 py-1 text-gray-600">
+                            {player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS}
+                            <div class="relative w-full h-1 bg-gray-200 rounded mt-1">
+                                <div
+                                    class="absolute top-0 left-0 h-full bg-red-500 rounded"
+                                    style="width: {Math.round((player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS / Math.max(...match.statsJson.map(p => p.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS))) * 100)}%;"
+                                ></div>
+                            </div>
+                        </td>
+                        <td class="px-2 py-1 text-gray-600">{player.WARD_PLACED} / {player.WARD_KILLED} / {player.VISION_WARDS_BOUGHT_IN_GAME}</td>
+                        <td class="px-2 py-1 text-gray-600">{formatCs(player)}</td>
+                    </tr>
+                {/each}
+                {/each}
+            </tbody>
+        </table>
     </div>
 </div>

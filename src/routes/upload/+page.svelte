@@ -7,6 +7,7 @@
 
     function handleFileUpload(event: unknown) {
         const uploadedFile = (event as any).target.files[0];
+        console.log(uploadedFile)
         if (uploadedFile) {
             parseRofl(uploadedFile).then((data) => {
                 console.log(data);
@@ -14,6 +15,24 @@
             }).catch((error) => {
                 console.error("Error parsing file:", error);
             });
+        }
+    }
+
+    function convertDateToDatepickerInput() {
+        if (matchInfo?.date) {
+            const date = new Date(matchInfo.date);
+            console.log(date.toISOString())
+            const iso = date.toISOString().split(":");
+            console.log(iso[0] + iso[1]);
+            return iso[0] + ':' + iso[1]; // Format as YYYY-MM-DD
+        }
+        return "";
+    }
+
+    function handleDateChange(event: Event) {
+        const input = event.target as HTMLInputElement;
+        if (matchInfo) {
+            matchInfo.date = new Date(input.valueAsNumber);
         }
     }
 </script>
@@ -25,7 +44,19 @@
 
 {#if matchInfo}
 <div class="flex flex-col space-y-4">
-    <h2 class="text-xl font-bold text-gray-800 mb-4">Match Preview</h2>
+    <h2 class="text-xl font-bold text-gray-800 my-4">Match Preview</h2>
+    <div class="flex flex-col space-y-2 ml-4 w-100">
+        <label for="match-date" class="text-sm font-medium text-gray-700">Set Match Date:</label>
+        <input
+            type="datetime-local"
+            value={convertDateToDatepickerInput()}
+            onchange="{handleDateChange}"
+            class="block w-full text-sm text-gray-500 form-input rounded-md"
+        />
+    </div>
+  
+
+    {matchInfo.date}
     <MatchPreview matchInfo={matchInfo} />
     <subtitle class="text-sm text-gray-500">This is a preview of the match data extracted from the replay file.</subtitle>
     <!-- Submit button-->

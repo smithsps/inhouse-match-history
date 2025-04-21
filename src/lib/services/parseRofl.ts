@@ -13,6 +13,7 @@ export type ROFL = {
     filename: string;
     gameVersion: string;
     metadata: Rofl1Metadata | Rofl2Metadata;
+    date: Date;
 }
 
 export async function parseRofl(file: File): Promise<ROFL> {
@@ -79,6 +80,7 @@ export async function parseRofl(file: File): Promise<ROFL> {
         version: rofl_version,
         filename: file.name,
         gameVersion: gameVersion || metadata.gameVersion,
+        date: new Date(file.lastModified),
         metadata
     }
 }
