@@ -78,7 +78,7 @@
     {#each matches.filter(match => match.filename.toLowerCase().includes(searchQuery.toLowerCase())) as match}
     <div class="mb-3 rounded-lg">
         <div class="text-sm text-gray-500 mb-2">
-            {new Date(match.date).toLocaleDateString()} {new Date(match.date).toLocaleTimeString()} • {match.filename} • {match.gameVersion}
+            {new Date(match.date).toLocaleDateString()} {new Date(match.date).toLocaleTimeString()} - {match.filename} - {match.gameVersion}
         </div>
         <MatchPreview matchInfo={match} />
     </div>

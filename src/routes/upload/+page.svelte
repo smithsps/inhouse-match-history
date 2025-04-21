@@ -45,7 +45,7 @@
 {#if matchInfo}
 <div class="flex flex-col space-y-4">
     <h2 class="text-xl font-bold text-gray-800 my-4">Match Preview</h2>
-    <div class="flex flex-col space-y-2 ml-4 w-100">
+    <div class="flex flex-col space-y-2 w-100">
         <label for="match-date" class="text-sm font-medium text-gray-700">Set Match Date:</label>
         <input
             type="datetime-local"

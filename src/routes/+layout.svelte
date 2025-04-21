@@ -9,7 +9,7 @@
 		<div class="max-w-4xl mx-auto">
 			<h1 class="text-xl flex justify-center font-bold">In-House Match History</h1>
 			<nav class="flex justify-center space-x-4">
-				<a href="/" class="text-white hover:underline">Home</a>
+				<a href="/" class="text-white hover:underline">Matches</a>
 				<a href="/upload" class="text-white hover:underline">Upload</a>
 			</nav>
 		</div>

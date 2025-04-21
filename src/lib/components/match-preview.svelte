@@ -68,6 +68,13 @@
         const jungle = parseInt(player.NEUTRAL_MINIONS_KILLED);
         return minions + jungle;
     };
+
+    const calculateDamagePercentage = (player: Rofl2PlayerStats) => {
+        const damage = parseInt(player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS);
+        const max = Math.max(...match.statsJson.map(p => parseInt(p.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS)));
+
+        return Math.round((damage / max) * 100)
+    };
 </script>
 
 <div class="grid grid-cols-2 gap-0">
@@ -121,7 +128,7 @@
                             <div class="relative w-full h-1 bg-gray-200 rounded mt-1">
                                 <div
                                     class="absolute top-0 left-0 h-full bg-blue-500 rounded"
-                                    style="width: {Math.round((player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS / Math.max(...match.statsJson.map(p => p.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS))) * 100)}%;"
+                                    style="width: {calculateDamagePercentage(player)}%;"
                                 ></div>
                             </div>
                         </td>
@@ -184,7 +191,7 @@
                             <div class="relative w-full h-1 bg-gray-200 rounded mt-1">
                                 <div
                                     class="absolute top-0 left-0 h-full bg-red-500 rounded"
-                                    style="width: {Math.round((player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS / Math.max(...match.statsJson.map(p => p.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS))) * 100)}%;"
+                                    style="width: {calculateDamagePercentage(player)}%;"
                                 ></div>
                             </div>
                         </td>
