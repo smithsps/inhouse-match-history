@@ -15,7 +15,4 @@
 	<main class="flex-grow p-4">
 		{@render children()}
 	</main>
-	<footer class="bg-gray-800 text-white text-center p-2">
-		<p>&copy; 2023 My App</p>
-	</footer>
 </div>

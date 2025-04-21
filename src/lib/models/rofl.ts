@@ -1,12 +1,12 @@
-export interface GameStats {
+export interface Rofl1Metadata {
     gameLength: number;
     gameVersion: string;
     lastGameChunkId: number;
     lastKeyFrameId: number;
-    statsJson: PlayerStats[];
+    statsJson: Rolf1PlayerStats[];
 }
 
-export interface PlayerStats {
+export interface Rolf1PlayerStats {
     ALL_IN_PINGS: string;
     ASSISTS: string;
     ASSIST_ME_PINGS: string;
