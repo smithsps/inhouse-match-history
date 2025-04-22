@@ -1,6 +1,5 @@
 import { fail, type Actions } from "@sveltejs/kit";
 import { S3Client, PutObjectCommand, ListBucketsCommand } from "@aws-sdk/client-s3";
-import { createHash } from "crypto";
 import { env } from "$env/dynamic/private";
 
 export const actions = {
@@ -14,6 +13,11 @@ export const actions = {
             if (!file || !(file instanceof File)) {
                 throw new Error("Invalid file");
             }
+
+            const fileBuffer = Buffer.from(await file.arrayBuffer());
+            const hash = await crypto.subtle.digest("SHA-1", fileBuffer);
+            const hashArray = Array.from(new Uint8Array(hash));
+            const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, "0")).join("");
 
             const bucketName = env.R2_BUCKET_NAME;
             const region = "us-east-1";
@@ -30,10 +34,6 @@ export const actions = {
                 requestChecksumCalculation: "WHEN_REQUIRED",
                 responseChecksumValidation: "WHEN_REQUIRED",
             });
-
-            const fileBuffer = Buffer.from(await file.arrayBuffer());
-            const hash = createHash("md5").update(fileBuffer).digest();
-            const hashHex = hash.toString("hex");
 
             const uploadParams = {
                 Bucket: "inhouse-replay-files",
