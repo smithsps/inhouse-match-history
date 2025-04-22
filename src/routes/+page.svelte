@@ -22,7 +22,7 @@
     {#each matches as match (match.id)}
     <div class="mb-3 rounded-lg">
         <div class="text-sm text-gray-500 mb-2">
-            {new Date(match.data.date).toLocaleDateString()} {new Date(match.data.date).toLocaleTimeString()} - {match.data.filename} - {match.data.gameVersion}
+            {new Date(match.data.date).toLocaleDateString()} {new Date(match.data.date).toLocaleTimeString()} - {match.match_id} - {match.data.gameVersion}
         </div>
         <MatchPreview matchInfo={match.data} />
     </div>

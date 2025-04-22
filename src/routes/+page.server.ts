@@ -1,9 +1,9 @@
 import type { ROFL } from '$lib/services/parseRofl';
-import { resourceLimits } from 'worker_threads';
 import type { PageServerLoad } from './$types';
 
 export type Match = {
   id: number;
+  match_id: number;
   file_name: string;
   file_size: number;
   file_hash: string;
@@ -18,6 +18,12 @@ export const load: PageServerLoad = async ({ params, platform }) => {
 		matches: await retrieveMatches(platform!),
 	};
 };
+
+export const actions = {
+  deleteMatch: async ({ request, platform }) => {
+    
+  }
+}
 
 async function retrieveMatches(platform: Readonly<App.Platform>): Promise<Match[]> {
   const query = `

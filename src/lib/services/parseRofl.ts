@@ -10,6 +10,7 @@ type RoflVersion = 1 | 2;
 
 export type ROFL = {
     version: number;
+    match_id: string;
     filename: string;
     gameVersion: string;
     metadata: Rofl1Metadata | Rofl2Metadata;
@@ -18,6 +19,9 @@ export type ROFL = {
 
 export async function parseRofl(file: File): Promise<ROFL> {
     const arrayBuffer = await file.arrayBuffer();
+
+    // Grab match id from filename (NA1-5270847442.rofl => NA1_5270847442)
+    const matchId = file.name.replace(/\.rofl$/, '').replace(/-/, '_');
 
     // Find the ROFL version signature from bytes 0 to 6
     let rofl_version: RoflVersion;
@@ -75,9 +79,9 @@ export async function parseRofl(file: File): Promise<ROFL> {
         throw new Error(`Invalid ROFL file signature - expected ROFL or ROFL2 signature, got ${fileSignature}`);
     }
 
-
     return {
         version: rofl_version,
+        match_id: matchId,
         filename: file.name,
         gameVersion: gameVersion || metadata.gameVersion,
         date: new Date(file.lastModified),

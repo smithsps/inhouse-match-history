@@ -14,6 +14,9 @@ export const actions = {
                 throw new Error("Invalid file");
             }
 
+            // Grab match id from filename (NA1-5270847442.rofl => NA1_5270847442)
+            const matchId = file.name.replace(/\.rofl$/, '').replace(/-/, '_');
+
             const fileBuffer = Buffer.from(await file.arrayBuffer());
             const hash = await crypto.subtle.digest("SHA-1", fileBuffer);
             const hashArray = Array.from(new Uint8Array(hash));
@@ -27,6 +30,7 @@ export const actions = {
 
             await storeMatch(
                 platform!,
+                matchId,
                 file.name,
                 file.size,
                 hashHex,
@@ -54,12 +58,12 @@ async function isMatchStored(platform: Readonly<App.Platform>, hashHex: string):
     return result?.count > 0;
 }
 
-async function storeMatch(platform: Readonly<App.Platform>, fileName: string, fileSize: number, fileHash: string, matchDate: Date, data: object): Promise<void> {
+async function storeMatch(platform: Readonly<App.Platform>, matchId: string, fileName: string, fileSize: number, fileHash: string, matchDate: Date, data: object): Promise<void> {
     const query = `
-        INSERT INTO matches (file_name, file_size, file_hash, match_date, data)
-        VALUES (?, ?, ?, ?, ?);
+        INSERT INTO matches (match_id, file_name, file_size, file_hash, match_date, data)
+        VALUES (?, ?, ?, ?, ?, ?);
     `;
-    await platform.env.DB.prepare(query).bind(fileName, fileSize, fileHash, matchDate.toISOString(), JSON.stringify(data)).run();
+    await platform.env.DB.prepare(query).bind(matchId, fileName, fileSize, fileHash, matchDate.toISOString(), JSON.stringify(data)).run();
 }
 
 async function storeFile(hashHex: string, fileBuffer: Buffer<ArrayBuffer>) {
