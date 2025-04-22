@@ -45,7 +45,7 @@
         <input id="file-upload" name="file" type="file" accept=".rofl" onchange={handleFileUpload} class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-gray-300 file:text-sm file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100" />
     </div>
 
-    {#if form?.error}<p class="text-red-500 text-sm mt-2">An error occurred and the replay was not uploaded.</p>{/if}
+    {#if form?.error}<p class="text-red-500 text-sm mt-2">{form?.error}</p>{/if}
 
     {#if matchInfo}
     <div class="flex flex-col space-y-4">

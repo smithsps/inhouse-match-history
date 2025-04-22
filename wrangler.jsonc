@@ -5,5 +5,12 @@
     "assets": {
 		"binding": "ASSETS",
 		"directory": ".svelte-kit/cloudflare",
-	}
+	},
+	"d1_databases": [
+		{
+		  "binding": "DB",
+		  "database_name": "inhouse-matches",
+		  "database_id": "c073abc5-8057-4099-b183-f86a24bc447a"
+		}
+	]
 }

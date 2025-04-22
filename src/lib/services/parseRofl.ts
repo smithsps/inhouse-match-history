@@ -31,7 +31,7 @@ export async function parseRofl(file: File): Promise<ROFL> {
 
         // Replay signature is 256 bytes
         const replaySignatureBytes = new Uint8Array(arrayBuffer.slice(6, 262));
-        const replaySignature = new TextDecoder('utf-8').decode(replaySignatureBytes);
+        //const replaySignature = new TextDecoder('utf-8').decode(replaySignatureBytes);
 
         // Read length data 26 bytes
         const lengthDataBytes = new Uint8Array(arrayBuffer.slice(262, 288));
