@@ -1,5 +1,5 @@
 import { fail, type Actions  } from "@sveltejs/kit";
-import { S3Client, PutObjectCommand, ListBucketsCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { env } from "$env/dynamic/private";
 import { parseRofl } from "$lib/services/parseRofl";
 
@@ -17,7 +17,7 @@ export const actions = {
             // Grab match id from filename (NA1-5270847442.rofl => NA1_5270847442)
             const matchId = file.name.replace(/\.rofl$/, '').replace(/-/, '_');
 
-            const fileBuffer = Buffer.from(await file.arrayBuffer());
+            const fileBuffer = await file.arrayBuffer();
             const hash = await crypto.subtle.digest("SHA-1", fileBuffer);
             const hashArray = Array.from(new Uint8Array(hash));
             const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, "0")).join("");
