@@ -12,5 +12,10 @@
 		  "database_name": "inhouse-matches",
 		  "database_id": "c073abc5-8057-4099-b183-f86a24bc447a"
 		}
-	]
+	],
+	"observability": {
+		"logs": {
+			"enabled": true,
+		}
+	}
 }
