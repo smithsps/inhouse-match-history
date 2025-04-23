@@ -66,7 +66,7 @@ async function storeMatch(platform: Readonly<App.Platform>, matchId: string, fil
     await platform.env.DB.prepare(query).bind(matchId, fileName, fileSize, fileHash, matchDate.toISOString(), JSON.stringify(data)).run();
 }
 
-async function storeFile(hashHex: string, fileBuffer: Buffer<ArrayBuffer>) {
+async function storeFile(hashHex: string, fileBuffer: ArrayBuffer) {
     const bucketName = env.R2_BUCKET_NAME;
     const region = "us-east-1";
     const accessKeyId = env.R2_ACCESS_KEY_ID;
@@ -86,7 +86,7 @@ async function storeFile(hashHex: string, fileBuffer: Buffer<ArrayBuffer>) {
     const uploadParams = {
         Bucket: "inhouse-replay-files",
         Key: `${hashHex}`,
-        Body: fileBuffer
+        Body: new Uint8Array(fileBuffer)
     };
 
     await s3.send(new PutObjectCommand(uploadParams));
