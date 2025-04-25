@@ -65,6 +65,8 @@ export async function GET(event: RequestEvent): Promise<Response> {
             console.error(`Arctic Fetch Error:`, cause, e);
         }
 
+        console.error("Error during Discord OAuth callback:", e);
+
         return new Response(null, {
             status: 400
         })
