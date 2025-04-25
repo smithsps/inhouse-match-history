@@ -1,5 +1,5 @@
 --DROP TABLE IF EXISTS matches;
-CREATE TABLE matches (
+CREATE TABLE IF NOT EXISTS matches (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     match_id TEXT,
     file_name TEXT NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE matches (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE user (
+CREATE TABLE IF NOT EXISTS user (
     id INTEGER NOT NULL PRIMARY KEY,
     discord_id TEXT NOT NULL,
     username TEXT NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE user (
 );
 
 
-CREATE TABLE session (
+CREATE TABLE IF NOT EXISTS session (
     id TEXT NOT NULL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES user(id),
     expires_at INTEGER NOT NULL

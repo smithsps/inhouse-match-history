@@ -1,5 +1,5 @@
 import type { User } from "$lib/models/user";
-import { discord } from "$lib/services/lucia";
+import { discord } from "$lib/services/discord-auth";
 import { SessionService } from "$lib/services/session";
 import type { RequestEvent } from "@sveltejs/kit";
 import { ArcticFetchError, generateCodeVerifier, OAuth2RequestError } from "arctic";
@@ -8,8 +8,7 @@ import { ArcticFetchError, generateCodeVerifier, OAuth2RequestError } from "arct
 export async function GET(event: RequestEvent): Promise<Response> {
     try {
         const code = event.url.searchParams.get("code");
-        const codeVerifier = generateCodeVerifier();
-        const tokens = await discord.validateAuthorizationCode(code!, codeVerifier);
+        const tokens = await discord.validateAuthorizationCode(code!, null);
 
         const accessToken = tokens.accessToken();
         //const refreshToken = tokens.refreshToken();
