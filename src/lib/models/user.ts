@@ -1,7 +1,7 @@
 export interface User {
     id: number;
-    discordId: string;
+    discord_id: string;
     username: string;
     email: string;
-    discordAvatar?: string;
+    discord_avatar?: string;
 }

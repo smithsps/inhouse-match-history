@@ -17,7 +17,7 @@ const authHandle: Handle = async ({ event, resolve }) => {
         const { session, user } = await sessionService.validateSessionToken(token);
 
         if (session !== null) {
-            SessionService.setSessionTokenCookie(event, session.id, session.expiresAt);
+            SessionService.setSessionTokenCookie(event, session.id, session.expires_at);
         } else {
             SessionService.deleteSessionTokenCookie(event);
         }

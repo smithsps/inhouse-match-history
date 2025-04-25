@@ -24,8 +24,8 @@ export class SessionService {
         const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
         const session: Session = {
             id: sessionId,
-            userId,
-            expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) // 30 days expiration
+            user_id: userId,
+            expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) // 30 days expiration
         };
 
         await this.db.prepare(
@@ -33,8 +33,8 @@ export class SessionService {
         )
         .bind(
             session.id,
-            session.userId,
-            Math.floor(session.expiresAt.getTime() / 1000)
+            session.user_id,
+            Math.floor(session.expires_at.getTime() / 1000)
         ).run();
         return session;
     }
@@ -53,24 +53,24 @@ export class SessionService {
 
         const session: Session = {
             id: result.id,
-            userId: result.userId,
-            expiresAt: new Date(result.expiresAt as unknown as number * 1000)
+            user_id: result.user_id,
+            expires_at: new Date(result.expires_at as unknown as number * 1000)
         };
 
-        if (Date.now() >= session.expiresAt.getTime()) {
+        if (Date.now() >= session.expires_at.getTime()) {
             await this.db.prepare("DELETE FROM session WHERE id = ?")
                 .bind(session.id)
                 .run();
             return { session: null, user: null };
         }
 
-        if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 24 * 15) {
-            session.expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
+        if (Date.now() >= session.expires_at.getTime() - 1000 * 60 * 60 * 24 * 15) {
+            session.expires_at = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
             await this.db.prepare(
                 "UPDATE session SET expires_at = ? WHERE id = ?"
             )
             .bind(
-                Math.floor(session.expiresAt.getTime() / 1000),
+                Math.floor(session.expires_at.getTime() / 1000),
                 session.id
             )
             .run();
@@ -79,7 +79,7 @@ export class SessionService {
         const userResults = await this.db.prepare(
             "SELECT id, discord_id, username, email, discord_avatar FROM user WHERE id = ?"
         )
-        .bind(result.userId)
+        .bind(result.user_id)
         .first<User>();
 
         if (!userResults) {
@@ -88,10 +88,10 @@ export class SessionService {
 
         const user: User = {
             id: userResults.id,
-            discordId: userResults.discordId,
+            discord_id: userResults.discord_id,
             username: userResults.username,
             email: userResults.email,
-            discordAvatar: userResults.discordAvatar
+            discord_avatar: userResults.discord_avatar
         };
 
         return { session, user };

@@ -1,5 +1,5 @@
 export interface Session {
     id: string;
-    userId: number;
-    expiresAt: Date;
+    user_id: number;
+    expires_at: Date;
 }

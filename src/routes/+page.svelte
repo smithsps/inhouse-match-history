@@ -1,6 +1,5 @@
 <script lang="ts">
     import MatchPreview from '$lib/components/match-preview.svelte';
-    import type { ROFL } from '$lib/services/parseRofl';
     import type { PageProps } from './$types';
     import type { Match } from './proxy+page.server';
 
