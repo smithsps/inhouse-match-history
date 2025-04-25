@@ -10,3 +10,18 @@ CREATE TABLE matches (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE user (
+    id INTEGER NOT NULL PRIMARY KEY,
+    discord_id TEXT NOT NULL,
+    username TEXT NOT NULL,
+    email TEXT NOT NULL,
+    discord_avatar TEXT
+);
+
+
+CREATE TABLE session (
+    id TEXT NOT NULL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES user(id),
+    expires_at INTEGER NOT NULL
+);
