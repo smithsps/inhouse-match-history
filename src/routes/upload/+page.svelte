@@ -23,9 +23,7 @@
     function convertDateToDatepickerInput() {
         if (matchInfo?.date) {
             const date = new Date(matchInfo.date);
-            console.log(date.toISOString())
             const iso = date.toISOString().split(":");
-            console.log(iso[0] + iso[1]);
             return iso[0] + ':' + iso[1]; // Format as YYYY-MM-DD
         }
         return "";
@@ -63,7 +61,7 @@
     
 
         {matchInfo.date}
-        <MatchPreview matchInfo={matchInfo} />
+        <MatchPreview matchInfo={matchInfo} slug={null} />
         <subtitle class="text-sm text-gray-500">This is a preview of the match data extracted from the replay file.</subtitle>
         <!-- Submit button-->
         <button class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 w-50" type="submit">

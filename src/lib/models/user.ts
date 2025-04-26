@@ -4,4 +4,5 @@ export interface User {
     username: string;
     email: string;
     discord_avatar?: string;
+    is_admin: boolean;
 }

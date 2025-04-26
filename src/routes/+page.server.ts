@@ -13,9 +13,10 @@ export type Match = {
   updated_at: string;
 };
 
-export const load: PageServerLoad = async ({ params, platform }) => {
+export const load: PageServerLoad = async ({ platform, locals }) => {
 	return {
 		matches: await retrieveMatches(platform!),
+    user: locals.user
 	};
 };
 

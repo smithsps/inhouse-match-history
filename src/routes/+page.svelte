@@ -20,10 +20,15 @@
 
     {#each matches as match (match.id)}
     <div class="mb-3 rounded-lg">
-        <div class="text-sm text-gray-500 mb-2">
-            {new Date(match.data.date).toLocaleDateString()} {new Date(match.data.date).toLocaleTimeString()} - {match.match_id} - {match.data.gameVersion}
-        </div>
-        <MatchPreview matchInfo={match.data} />
+        <a href={`/match/${match.file_hash}`} class="text-sm text-gray-500 mb-2">
+            <div class="flex items-center space-x-4 text-gray-700 ml-2">
+                <div class="text-xs font-medium text-gray-500">{new Date(match.data.date).toLocaleDateString()}</div>
+                <div class="text-xs text-gray-500">{new Date(match.data.date).toLocaleTimeString()}</div>
+                <div class="text-xs text-gray-500">{match.match_id}</div>
+                <div class="text-xs text-gray-500">{match.data.gameVersion}</div>
+            </div>
+        </a>
+        <MatchPreview matchInfo={match.data} slug={match.file_hash} />
     </div>
     {/each}
 </div>

@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS users (
     username TEXT NOT NULL,
     email TEXT NOT NULL,
     discord_avatar TEXT
+    is_admin BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS sessions (

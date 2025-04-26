@@ -1,7 +1,14 @@
-import { fail, type Actions  } from "@sveltejs/kit";
+import { fail, redirect, type Actions  } from "@sveltejs/kit";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { env } from "$env/dynamic/private";
 import { parseRofl } from "$lib/services/parseRofl";
+import type { PageServerLoad } from "../$types";
+
+export const load: PageServerLoad = async ({ locals }) => {
+    if (!locals.user || !locals.user?.is_admin) {
+        throw redirect(303, '/login');
+    }
+};
 
 export const actions = {
     default: async ({ request, platform }) => {

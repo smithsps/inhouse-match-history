@@ -77,7 +77,7 @@ export class SessionService {
         }
 
         const userResults = await this.db.prepare(
-            "SELECT id, discord_id, username, email, discord_avatar FROM users WHERE id = ?"
+            "SELECT id, discord_id, username, email, discord_avatar, is_admin FROM users WHERE id = ?"
         )
         .bind(result.user_id)
         .first<User>();
@@ -91,7 +91,8 @@ export class SessionService {
             discord_id: userResults.discord_id,
             username: userResults.username,
             email: userResults.email,
-            discord_avatar: userResults.discord_avatar
+            discord_avatar: userResults.discord_avatar,
+            is_admin: userResults.is_admin ? true : false
         };
 
         return { session, user };

@@ -1,4 +1,8 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
+
+import type { Session } from "$lib/models/session";
+import type { User } from "$lib/models/user";
+
 // for information about these interfaces
 declare global {
 	namespace App {
