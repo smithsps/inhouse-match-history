@@ -22,11 +22,11 @@ export async function GET(event: RequestEvent): Promise<Response> {
         const discordUser: any = await discordUserResponse.json();
         console.log("Logged in Discord User:", discordUser);
 
-        let user = await event.platform!.env.DB.prepare("SELECT * FROM user WHERE discord_id = ?").bind(discordUser.id).first<User>();
+        let user = await event.platform!.env.DB.prepare("SELECT * FROM users WHERE discord_id = ?").bind(discordUser.id).first<User>();
 
         if (!user) {
             user = await event.platform!.env.DB.prepare(
-                "INSERT INTO user (discord_id, username, email, discord_avatar) VALUES (?, ?, ?, ?) RETURNING *"
+                "INSERT INTO users (discord_id, username, email, discord_avatar) VALUES (?, ?, ?, ?) RETURNING *"
             )
             .bind(discordUser.id, discordUser.username, discordUser.email, discordUser.avatar)
             .first<User>();
@@ -40,7 +40,6 @@ export async function GET(event: RequestEvent): Promise<Response> {
         const sessionService = new SessionService(event.platform!.env.DB);
         const sessionToken = sessionService.generateSessionToken();
         const session = await sessionService.createSession(sessionToken, user.id);
-        
         SessionService.setSessionTokenCookie(event, sessionToken, session.expires_at);
     
         return new Response(null, {

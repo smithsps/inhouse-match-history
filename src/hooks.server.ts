@@ -5,7 +5,6 @@ import { sequence } from "@sveltejs/kit/hooks";
 
 const authHandle: Handle = async ({ event, resolve }) => {
     const token = event.cookies.get("session") ?? null;
-    
     if (token === null) {
         event.locals.user = null;
         event.locals.session = null;
@@ -17,10 +16,13 @@ const authHandle: Handle = async ({ event, resolve }) => {
         const { session, user } = await sessionService.validateSessionToken(token);
 
         if (session !== null) {
-            SessionService.setSessionTokenCookie(event, session.id, session.expires_at);
+            SessionService.setSessionTokenCookie(event, token, session.expires_at);
         } else {
             SessionService.deleteSessionTokenCookie(event);
         }
+
+        event.locals.user = user;
+        event.locals.session = session;
     }
 
     return resolve(event);

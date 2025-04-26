@@ -29,7 +29,7 @@ export class SessionService {
         };
 
         await this.db.prepare(
-            "INSERT INTO session (id, user_id, expires_at) VALUES (?, ?, ?)"
+            "INSERT INTO sessions (id, user_id, expires_at) VALUES (?, ?, ?)"
         )
         .bind(
             session.id,
@@ -42,7 +42,7 @@ export class SessionService {
     async validateSessionToken(token: string): Promise<SessionValidationResult> {
         const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
         const result = await this.db.prepare(
-            "SELECT session.id, session.user_id, session.expires_at, user.id FROM session INNER JOIN user ON user.id = session.user_id WHERE session.id = ?"
+            "SELECT sessions.id, sessions.user_id, sessions.expires_at, users.id as user_id FROM sessions INNER JOIN users ON users.id = sessions.user_id WHERE sessions.id = ?"
         )
         .bind(sessionId)
         .first<Session>();
@@ -58,7 +58,7 @@ export class SessionService {
         };
 
         if (Date.now() >= session.expires_at.getTime()) {
-            await this.db.prepare("DELETE FROM session WHERE id = ?")
+            await this.db.prepare("DELETE FROM sessions WHERE id = ?")
                 .bind(session.id)
                 .run();
             return { session: null, user: null };
@@ -77,7 +77,7 @@ export class SessionService {
         }
 
         const userResults = await this.db.prepare(
-            "SELECT id, discord_id, username, email, discord_avatar FROM user WHERE id = ?"
+            "SELECT id, discord_id, username, email, discord_avatar FROM users WHERE id = ?"
         )
         .bind(result.user_id)
         .first<User>();
@@ -98,13 +98,13 @@ export class SessionService {
     }
 
     async invalidateSession(sessionId: string): Promise<void> {
-        await this.db.prepare("DELETE FROM session WHERE id = ?")
+        await this.db.prepare("DELETE FROM sessions WHERE id = ?")
             .bind(sessionId)
             .run();
     }
 
     async invalidateAllSessions(userId: number): Promise<void> {
-        await this.db.prepare("DELETE FROM session WHERE user_id = ?")
+        await this.db.prepare("DELETE FROM sessions WHERE user_id = ?")
             .bind(userId)
             .run();
     }
