@@ -1,10 +1,10 @@
 <script lang="ts">
-    import type { Rolf1PlayerStats } from '$lib/models/rofl';
     import type { Rofl2Metadata, Rofl2PlayerStats } from '$lib/models/rofl2';
     import type { ROFL } from '$lib/services/parseRofl';
     import { onMount } from 'svelte';
 
     let { data } = $props();
+    let user = $derived(data.user);
 
     const storedMatch = $derived(data.match);
     const match = $derived(storedMatch.data as ROFL);
@@ -86,6 +86,27 @@
             <div class="text-xs text-gray-500">{new Date(match.date).toLocaleTimeString()}</div>
             <div class="text-xs text-gray-500">{storedMatch.match_id}</div>
             <div class="text-xs text-gray-500">{match.gameVersion}</div>
+            <div class="ml-auto"></div>
+            {#if user?.is_admin}
+            <button
+                class="text-xs text-red-500 hover:underline border border-red-500 rounded px-2 py-1 cursor-pointer"
+                onclick={() => {
+                    if (confirm('Are you sure you want to delete this match?')) {
+                        window.location.href = `/match/${storedMatch.file_hash}/delete`;
+                    }
+                }}
+            >
+                Delete Match
+            </button>
+            {/if}
+
+            <a
+                class="text-xs text-blue-500 hover:underline ml-1 border border-blue-500 rounded px-2 py-1 cursor-pointer"
+                href="/match/{storedMatch.file_hash}/download"
+                target="_blank"
+            >
+                Download Replay File
+            </a>
         </div>
     </div>
 </div>
