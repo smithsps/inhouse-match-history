@@ -44,17 +44,18 @@ async function generateReplayLink(platform: Readonly<App.Platform>, match: Match
   const params: GetObjectCommandInput = {
     Bucket: bucket,
     Key: match.file_hash,
-    ResponseContentDisposition: `attachment; filename="${match.file_name}"`,
+    //ResponseContentDisposition: `attachment; filename="${match.file_name}"`,
+    ResponseContentType: 'application/octet-stream',
   };
 
   const command = new GetObjectCommand(params);
   const url = await getSignedUrl(s3, command, { expiresIn: 3600  });
 
   // Remove bucket name from the subdomain
-  const urlWithoutBucket = url.replace(`https://${env.R2_BUCKET_DOMAIN}.`, `https://`);
+  const urlWithoutBucket = url.replace(`${bucket}.`, '');
 
   const urlObj = new URL(urlWithoutBucket);
-  urlObj.searchParams.set("filename", match.file_name);
+  urlObj.searchParams.set("response-content-disposition", `attachment;filename="${match.file_name}"`);
 
   return urlObj.toString();
 }
