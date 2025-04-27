@@ -50,9 +50,11 @@ async function generateReplayLink(platform: Readonly<App.Platform>, match: Match
   const command = new GetObjectCommand(params);
   const url = await getSignedUrl(s3, command, { expiresIn: 3600  });
 
-  // Add filename parameter to the URL
-  const urlObj = new URL(url);
+  // Remove bucket name from the subdomain
+  const urlWithoutBucket = url.replace(`https://${env.R2_BUCKET_DOMAIN}.`, `https://`);
+
+  const urlObj = new URL(urlWithoutBucket);
   urlObj.searchParams.set("filename", match.file_name);
 
-  return url;
+  return urlObj.toString();
 }
