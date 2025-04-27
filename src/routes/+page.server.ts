@@ -10,16 +10,16 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
 };
 
 async function retrieveMatches(platform: Readonly<App.Platform>): Promise<Match[]> {
-  const query = `
-      SELECT * FROM matches
-      ORDER BY match_date DESC;
-  `;
-  const result = await platform.env.DB.prepare(query).all<Match>();
+  const result = await platform.env.DB.prepare("SELECT * FROM matches").all<Match>();
 
   const matches = result.results.map((m: Match) => ({
     ...m,
     data: JSON.parse(m.data as any) as ROFL,
-  }));
+  })).sort((a, b) => {
+    const a_matchid = a.match_id.split('_')[1];
+    const b_matchid = b.match_id.split('_')[1];
+    return parseInt(a_matchid) - parseInt(b_matchid);
+  });
 
   return matches || [];
 }
