@@ -39,6 +39,7 @@ async function generateReplayLink(platform: Readonly<App.Platform>, match: Match
     },
     requestChecksumCalculation: "WHEN_REQUIRED",
     responseChecksumValidation: "WHEN_REQUIRED",
+    forcePathStyle: true
   });
 
   const params: GetObjectCommandInput = {
