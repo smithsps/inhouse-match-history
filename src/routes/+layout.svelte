@@ -10,6 +10,7 @@
 			<h1 class="text-xl flex justify-center font-bold">In-House Match History</h1>
 			<nav class="flex justify-center items-center space-x-4 mt-2">
 				<a href="/" class="text-white hover:underline">Matches</a>
+				<a href="/leaderboard" class="text-white hover:underline">Leaderboard</a>
 				{#if data.user}
 					<a href="/upload" class="text-white hover:underline">Upload</a>
 				{/if}
