@@ -38,12 +38,11 @@ async function generateReplayLink(platform: Readonly<App.Platform>, match: Match
       secretAccessKey,
     },
     requestChecksumCalculation: "WHEN_REQUIRED",
-    responseChecksumValidation: "WHEN_REQUIRED",
-    bucketEndpoint: true,
+    responseChecksumValidation: "WHEN_REQUIRED"
   });
 
   const params: GetObjectCommandInput = {
-    Bucket: bucketName,
+    Bucket: undefined,
     Key: match.file_hash,
     ResponseContentDisposition: `attachment; filename="${match.file_name}"`,
   };
