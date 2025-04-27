@@ -17,5 +17,9 @@
 		"logs": {
 			"enabled": true,
 		}
+	},
+	"vars": {
+		"DOMAIN": "inhouse.smnth.net",
+		"R2_BUCKET_DOMAIN": "download.inhouses.smnth.net"
 	}
 }
