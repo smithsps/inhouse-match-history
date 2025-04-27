@@ -25,7 +25,6 @@ async function getMatch(platform: Readonly<App.Platform>, slug: string): Promise
 }
 
 async function generateReplayLink(platform: Readonly<App.Platform>, match: Match): Promise<string> {
-  const bucketName = env.R2_BUCKET_NAME;
   const region = "us-east-1";
   const accessKeyId = env.R2_ACCESS_KEY_ID;
   const secretAccessKey = env.R2_SECRET_ACCESS_KEY;
@@ -38,7 +37,7 @@ async function generateReplayLink(platform: Readonly<App.Platform>, match: Match
       secretAccessKey,
     },
     requestChecksumCalculation: "WHEN_REQUIRED",
-    responseChecksumValidation: "WHEN_REQUIRED"
+    responseChecksumValidation: "WHEN_REQUIRED",
   });
 
   const params: GetObjectCommandInput = {
@@ -48,5 +47,11 @@ async function generateReplayLink(platform: Readonly<App.Platform>, match: Match
   };
 
   const command = new GetObjectCommand(params);
-  return await getSignedUrl(s3, command, { expiresIn: 3600  });
+  const url = await getSignedUrl(s3, command, { expiresIn: 3600  });
+
+  // Add filename parameter to the URL
+  const urlObj = new URL(url);
+  urlObj.searchParams.set("filename", match.file_name);
+
+  return url;
 }
