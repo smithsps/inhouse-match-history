@@ -5,7 +5,7 @@ import { parseRofl } from "$lib/services/parseRofl";
 import type { PageServerLoad } from "../$types";
 
 export const load: PageServerLoad = async ({ locals }) => {
-    if (!locals.user || !locals.user?.is_admin) {
+    if (!locals.user) {
         throw redirect(303, '/login');
     }
 };
