@@ -25,6 +25,7 @@ async function getMatch(platform: Readonly<App.Platform>, slug: string): Promise
 }
 
 async function generateReplayLink(platform: Readonly<App.Platform>, match: Match): Promise<string> {
+  const bucket = env.R2_BUCKET_NAME;
   const region = "us-east-1";
   const accessKeyId = env.R2_ACCESS_KEY_ID;
   const secretAccessKey = env.R2_SECRET_ACCESS_KEY;
@@ -41,7 +42,7 @@ async function generateReplayLink(platform: Readonly<App.Platform>, match: Match
   });
 
   const params: GetObjectCommandInput = {
-    Bucket: undefined,
+    Bucket: bucket,
     Key: match.file_hash,
     ResponseContentDisposition: `attachment; filename="${match.file_name}"`,
   };
