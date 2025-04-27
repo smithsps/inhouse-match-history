@@ -1,6 +1,6 @@
 import { redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "../$types";
-import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { GetObjectCommand, S3Client, type GetObjectCommandInput } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { env } from "$env/dynamic/private";
 
@@ -31,7 +31,7 @@ async function generateReplayLink(platform: Readonly<App.Platform>, matchHistory
 
   const s3 = new S3Client({
     region,
-    endpoint: `https://${bucketName}.r2.cloudflarestorage.com`,
+    endpoint: `https://${env.R2_BUCKET_DOMAIN}`,
     credentials: {
       accessKeyId,
       secretAccessKey,
@@ -40,12 +40,11 @@ async function generateReplayLink(platform: Readonly<App.Platform>, matchHistory
     responseChecksumValidation: "WHEN_REQUIRED",
   });
 
-  const params = {
+  const params: GetObjectCommandInput = {
     Bucket: bucketName,
-    Key: matchHistory,
-    Expires: 60 * 60, // Link valid for 1 hour
+    Key: matchHistory
   };
 
   const command = new GetObjectCommand(params);
-  return await getSignedUrl(s3, command, { expiresIn: 3600 });
+  return await getSignedUrl(s3, command, { expiresIn: 3600  });
 }
