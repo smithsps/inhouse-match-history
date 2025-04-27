@@ -1,17 +1,6 @@
 import type { ROFL } from '$lib/services/parseRofl';
 import type { PageServerLoad } from './$types';
-
-export type Match = {
-  id: number;
-  match_id: number;
-  file_name: string;
-  file_size: number;
-  file_hash: string;
-  match_date: string;
-  data: ROFL; // TEXT in the database, parsed as ROFL object
-  created_at: string;
-  updated_at: string;
-};
+import type { Match } from '../lib/models/match';
 
 export const load: PageServerLoad = async ({ platform, locals }) => {
 	return {
@@ -19,12 +8,6 @@ export const load: PageServerLoad = async ({ platform, locals }) => {
     user: locals.user
 	};
 };
-
-export const actions = {
-  deleteMatch: async ({ request, platform }) => {
-    
-  }
-}
 
 async function retrieveMatches(platform: Readonly<App.Platform>): Promise<Match[]> {
   const query = `

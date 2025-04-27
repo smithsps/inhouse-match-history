@@ -3,6 +3,7 @@ import type { PageServerLoad } from "../$types";
 import { GetObjectCommand, S3Client, type GetObjectCommandInput } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { env } from "$env/dynamic/private";
+import type { Match } from "$lib/models/match";
 
 
 export const load: PageServerLoad = async ({ platform, params, locals }) => {
@@ -10,20 +11,20 @@ export const load: PageServerLoad = async ({ platform, params, locals }) => {
       throw new Error("Match slug is required");
     }
 
-    if (!await checkMatchExists(platform!, params.slug)) {
-      throw new Error("Match not found");
+    const match = await getMatch(platform!, params.slug);
+    if (!match) {
+      redirect(404, '/');
     }
 
-    const url = await generateReplayLink(platform!, params.slug);
+    const url = await generateReplayLink(platform!, match);
     redirect(303, url);
 };
 
-async function checkMatchExists(platform: Readonly<App.Platform>, matchHash: string): Promise<boolean> {
-  const result = await platform.env.DB.prepare("SELECT COUNT(*) as count FROM matches WHERE file_hash = ?").bind(matchHash).first<{ count: number }>();
-  return result != null && result.count > 0;
+async function getMatch(platform: Readonly<App.Platform>, slug: string): Promise<Match | null> {
+  return await platform.env.DB.prepare("SELECT * FROM matches WHERE file_hash = ?").bind(slug).first<Match>();
 }
 
-async function generateReplayLink(platform: Readonly<App.Platform>, matchHistory: string): Promise<string> {
+async function generateReplayLink(platform: Readonly<App.Platform>, match: Match): Promise<string> {
   const bucketName = env.R2_BUCKET_NAME;
   const region = "us-east-1";
   const accessKeyId = env.R2_ACCESS_KEY_ID;
@@ -42,7 +43,8 @@ async function generateReplayLink(platform: Readonly<App.Platform>, matchHistory
 
   const params: GetObjectCommandInput = {
     Bucket: bucketName,
-    Key: matchHistory
+    Key: match.file_hash,
+    ResponseContentDisposition: `attachment; filename="${match.file_name}"`,
   };
 
   const command = new GetObjectCommand(params);
