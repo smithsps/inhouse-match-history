@@ -6,19 +6,29 @@
     let { data }: PageProps = $props();
     let matches: Match[] = $derived(data.matches); // Matches from the page props
 
-    let searchQuery = $state(''); // Search query state
+    let searchQuery = $state('');
+
+    const filteredMatches = $derived(
+        matches.filter(match => {
+            return match.data.metadata.statsJson.some(player => 
+                player.NAME.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                player.RIOT_ID_GAME_NAME.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                player.SKIN.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        })
+    );
 </script>
 
 
 <div>
     <input
         type="text"
-        placeholder="Search matches..."
+        placeholder="Filter matches by player or champion..."
         bind:value={searchQuery}
         class="mb-4 p-2 border rounded w-full"
     />
 
-    {#each matches as match (match.id)}
+    {#each filteredMatches as match (match.id)}
     <div class="mb-3 rounded-lg">
         <a href={`/match/${match.file_hash}`} class="text-sm text-gray-500 mb-2">
             <div class="flex items-center space-x-4 text-gray-700 ml-2">

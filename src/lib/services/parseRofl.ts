@@ -13,7 +13,7 @@ export type ROFL = {
     match_id: string;
     filename: string;
     gameVersion: string;
-    metadata: Rofl1Metadata | Rofl2Metadata;
+    metadata: Rofl2Metadata;
     date: Date;
 }
 
