@@ -25,8 +25,17 @@
         type="text"
         placeholder="Filter matches by player or champion..."
         bind:value={searchQuery}
-        class="mb-4 p-2 border rounded w-full"
+        class="p-2 border rounded w-full"
     />
+    <div class="text-gray-500 mt-1 mb-4 text-xs ml-2">
+        {#if filteredMatches.length === 0}
+            <span>No matches found</span>
+        {:else if filteredMatches.length === matches.length}
+            <span>All {matches.length} matches displayed</span>
+        {:else}
+            <span><i>Showing {filteredMatches.length} out of {matches.length} matches</i></span>
+        {/if}
+    </div>
 
     {#each filteredMatches as match (match.id)}
     <div class="mb-3 rounded-lg">

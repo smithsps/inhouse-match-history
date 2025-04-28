@@ -16,9 +16,17 @@ async function retrieveMatches(platform: Readonly<App.Platform>): Promise<Match[
     ...m,
     data: JSON.parse(m.data as any) as ROFL,
   })).sort((a, b) => {
-    const a_matchid = a.match_id.split('_')[1];
-    const b_matchid = b.match_id.split('_')[1];
-    return parseInt(a_matchid) - parseInt(b_matchid);
+    try {
+      // Attempt to parse match_id as a number for sorting
+      const a_matchid = parseInt(a.match_id.split('_')[1]);
+      const b_matchid = parseInt(b.match_id.split('_')[1]);
+
+      return b_matchid - a_matchid;
+    }
+    catch (error) {
+      // Sort to end
+      return 1
+    }
   });
 
   return matches || [];
