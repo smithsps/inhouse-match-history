@@ -1,21 +1,14 @@
 // Used https://github.com/fraxiinus/roflxd.cs/blob/master/Rofl.Extract.Data/Readers/RoflReader.cs for reference.
 
-import type { Rofl1Metadata } from "$lib/models/rofl";
-import type { Rofl2Metadata } from "$lib/models/rofl2";
+import type { Rofl1Metadata } from "$lib/models/rofl-version1";
+import type { RoflMetadata } from "$lib/models/rofl";
+import type { DraftState } from "$lib/models/draft.js";
 
 export const ROFL_SIGNATURE = new Uint8Array([0x52, 0x49, 0x4F, 0x54, 0x00, 0x00]); //RIOT00
 export const ROFL2_SIGNATURE = new Uint8Array([0x52, 0x49, 0x4F, 0x54, 0x02, 0x00]); //RIOT20
 
 type RoflVersion = 1 | 2;
 
-export type ROFL = {
-    version: number;
-    match_id: string;
-    filename: string;
-    gameVersion: string;
-    metadata: Rofl2Metadata;
-    date: Date;
-}
 
 export async function parseRofl(file: File): Promise<ROFL> {
     const arrayBuffer = await file.arrayBuffer();

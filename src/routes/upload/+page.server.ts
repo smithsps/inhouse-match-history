@@ -34,6 +34,8 @@ export const actions = {
             }
 
             const parsedData = await parseRofl(file);
+            const draftData = data.get("draft-state") as string;
+            const mvpPlayer = data.get("mvp-player") as string;
 
             await storeMatch(
                 platform!,
@@ -42,7 +44,9 @@ export const actions = {
                 file.size,
                 hashHex,
                 date,
-                parsedData
+                parsedData,
+                draftData,
+                mvpPlayer
             );
 
             await storeFile(hashHex, fileBuffer);
@@ -65,12 +69,12 @@ async function isMatchStored(platform: Readonly<App.Platform>, hashHex: string):
     return result?.count > 0;
 }
 
-async function storeMatch(platform: Readonly<App.Platform>, matchId: string, fileName: string, fileSize: number, fileHash: string, matchDate: Date, data: object): Promise<void> {
+async function storeMatch(platform: Readonly<App.Platform>, matchId: string, fileName: string, fileSize: number, fileHash: string, matchDate: Date, data: object, draftData: string, mvpPlayer: string): Promise<void> {
     const query = `
-        INSERT INTO matches (match_id, file_name, file_size, file_hash, match_date, data)
-        VALUES (?, ?, ?, ?, ?, ?);
+        INSERT INTO matches (match_id, file_name, file_size, file_hash, match_date, data, draft_data, mvp_player)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?);
     `;
-    await platform.env.DB.prepare(query).bind(matchId, fileName, fileSize, fileHash, matchDate.toISOString(), JSON.stringify(data)).run();
+    await platform.env.DB.prepare(query).bind(matchId, fileName, fileSize, fileHash, matchDate.toISOString(), JSON.stringify(data), draftData, mvpPlayer).run();
 }
 
 async function storeFile(hashHex: string, fileBuffer: ArrayBuffer) {

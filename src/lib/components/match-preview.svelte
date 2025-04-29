@@ -1,12 +1,12 @@
 <script lang="ts">
-    import type { Rolf1PlayerStats } from '$lib/models/rofl';
-    import type { Rofl2Metadata, Rofl2PlayerStats } from '$lib/models/rofl2';
+    import type { Rolf1PlayerStats } from '$lib/models/rofl-version1';
+    import type { RoflMetadata, RoflPlayerStats } from '$lib/models/rofl';
     import type { ROFL } from '$lib/services/parseRofl';
     import { onMount } from 'svelte';
 
     let {matchInfo, slug} = $props();
 
-    let match: Rofl2Metadata = $derived(matchInfo.metadata);
+    let match: RoflMetadata = $derived(matchInfo.metadata);
 
     let championImages: Record<string, string> = $state({});
     let summonerSpellImages: Record<string, string> = $state({});
@@ -63,13 +63,13 @@
         return g > 1000 ? `${(g / 1000).toFixed(1)}k` : g.toString();
     };
 
-    const formatCs = (player: Rofl2PlayerStats) => {
+    const formatCs = (player: RoflPlayerStats) => {
         const minions = parseInt(player.MINIONS_KILLED);
         const jungle = parseInt(player.NEUTRAL_MINIONS_KILLED);
         return minions + jungle;
     };
 
-    const calculateDamagePercentage = (player: Rofl2PlayerStats) => {
+    const calculateDamagePercentage = (player: RoflPlayerStats) => {
         const damage = parseInt(player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS);
         const max = Math.max(...match.statsJson.map(p => parseInt(p.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS)));
 

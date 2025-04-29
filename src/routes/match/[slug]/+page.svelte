@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { Rofl2Metadata, Rofl2PlayerStats } from '$lib/models/rofl2';
+    import type { RoflMetadata, RoflPlayerStats } from '$lib/models/rofl.js';
     import type { ROFL } from '$lib/services/parseRofl';
     import { onMount } from 'svelte';
 
@@ -8,7 +8,7 @@
 
     const storedMatch = $derived(data.match);
     const match = $derived(storedMatch.data as ROFL);
-    let metadata: Rofl2Metadata = $derived(match.metadata as Rofl2Metadata);
+    let metadata: RoflMetadata = $derived(match.metadata as RoflMetadata);
 
     let championImages: Record<string, string> = $state({});
     let summonerSpellImages: Record<string, string> = $state({});
@@ -65,13 +65,13 @@
         return g > 1000 ? `${(g / 1000).toFixed(1)}k` : g.toString();
     };
 
-    const formatCs = (player: Rofl2PlayerStats) => {
+    const formatCs = (player: RoflPlayerStats) => {
         const minions = parseInt(player.MINIONS_KILLED);
         const jungle = parseInt(player.NEUTRAL_MINIONS_KILLED);
         return minions + jungle;
     };
 
-    const calculateDamagePercentage = (player: Rofl2PlayerStats) => {
+    const calculateDamagePercentage = (player: RoflPlayerStats) => {
         const damage = parseInt(player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS);
         const max = Math.max(...metadata.statsJson.map(p => parseInt(p.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS)));
 
@@ -110,6 +110,11 @@
         </div>
     </div>
 </div>
+
+/**
+{"blueName":"IHQ Blue: 80e5f1e6","redName":"IHQ Red: 80e5f1e6","disabledTurns":[],"disabledChamps":[],"timePerPick":"30","timePerBan":"30","bluePicks":["Chogath","Kayn","Caitlyn","Nautilus","Anivia"],"redPicks":["Yorick","Thresh","Azir","Smolder","Ahri"],"blueBans":["Bard","Hwei","Ekko","Sivir","Urgot"],"redBans":["Leona","Sejuani","Xerath","Milio","Blitzcrank"],"nextTeam":"none","nextType":"none","nextTimeout":0,"blueReady":true,"redReady":true,"state":"finished","turn":20}
+**/
+
 
 <div class="grid grid-cols-2 gap-0">
     <!-- Blue Team -->

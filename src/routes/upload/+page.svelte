@@ -1,20 +1,23 @@
 <script lang="ts">
     import MatchPreview from "$lib/components/match-preview.svelte";
+    import DraftScraper from "$lib/components/draft-scraper.svelte";
+    import type { DraftState } from "$lib/models/draft.js";
     import type { ROFL } from "$lib/services/parseRofl";
     import { parseRofl } from "$lib/services/parseRofl";
 
     let { form } = $props();
 
     let matchInfo: ROFL | undefined = $state(undefined);
+    let draftState: DraftState | undefined = $state(undefined);
 
     function handleFileUpload(event: unknown) {
         const uploadedFile = (event as any).target.files[0];
         console.log(uploadedFile)
         if (uploadedFile) {
-            parseRofl(uploadedFile).then((data) => {
+            parseRofl(uploadedFile).then((data: ROFL) => {
                 console.log(data);
                 matchInfo = data;
-            }).catch((error) => {
+            }).catch((error: any) => {
                 console.error("Error parsing file:", error);
             });
         }
@@ -35,6 +38,11 @@
             matchInfo.date = new Date(input.valueAsNumber);
         }
     }
+
+    function handleDraftScraped(draft: DraftState) {
+        draftState = draft;
+        matchInfo.draftState = draftState;
+    }
 </script>
 
 <form method="post" enctype="multipart/form-data">
@@ -48,8 +56,9 @@
     {#if matchInfo}
     <div class="flex flex-col space-y-4">
         <h2 class="text-xl font-bold text-gray-800 my-4">Match Preview</h2>
-        <div class="flex flex-col space-y-2 w-100">
+        <div class="flex flex-col w-100">
             <label for="match-date" class="text-sm font-medium text-gray-700">Set Match Date:</label>
+            {matchInfo.date}
             <input
                 name="match-date"
                 type="datetime-local"
@@ -58,9 +67,13 @@
                 class="block w-full text-sm text-gray-500 form-input rounded-md"
             />
         </div>
-    
 
-        {matchInfo.date}
+        {#if draftState}
+            <input type="hidden" name="draft-state" value={JSON.stringify(draftState)} />
+        {/if}
+
+        <DraftScraper onDraftScraped={handleDraftScraped} />
+
         <MatchPreview matchInfo={matchInfo} slug={null} />
         <subtitle class="text-sm text-gray-500">This is a preview of the match data extracted from the replay file.</subtitle>
         <!-- Submit button-->

@@ -1,16 +1,32 @@
-export interface Rofl1Metadata {
-    gameLength: number;
+import type { DraftState } from "./draft";
+
+// We are only dealing with version 2, so we can ignore using version 1 replay types
+
+export interface ROFL {
+    version: number;
+    match_id: string;
+    filename: string;
     gameVersion: string;
-    lastGameChunkId: number;
-    lastKeyFrameId: number;
-    statsJson: Rolf1PlayerStats[];
+    metadata: RoflMetadata;
+    date: Date;
+    draftState?: DraftState;
 }
 
-export interface Rolf1PlayerStats {
+export interface RoflMetadata {
+    gameLength: number;
+    lastGameChunkId: number;
+    lastKeyFrameId: number;
+    statsJson: RoflPlayerStats[];
+}
+
+export interface RoflPlayerStats {
     ALL_IN_PINGS: string;
     ASSISTS: string;
     ASSIST_ME_PINGS: string;
-    BAIT_PINGS: string;
+    ATAKHAN_KILLS: string;
+    ActMission_S1_A2_ArenaRoundsWon: string;
+    ActMission_S1_A2_BloodyPetalsCollected: string;
+    ActMission_S1_A2_FeatsOfStrength: string;
     BARON_KILLS: string;
     BARRACKS_KILLED: string;
     BARRACKS_TAKEDOWNS: string;
@@ -27,9 +43,34 @@ export interface Rolf1PlayerStats {
     DANGER_PINGS: string;
     DOUBLE_KILLS: string;
     DRAGON_KILLS: string;
+    DemonsHand_MissionPointsA: string;
+    DemonsHand_MissionPointsB: string;
+    DemonsHand_MissionPointsC: string;
+    DemonsHand_MissionPointsD: string;
+    DemonsHand_MissionPointsE: string;
+    DemonsHand_MissionPointsF: string;
     ENEMY_MISSING_PINGS: string;
     ENEMY_VISION_PINGS: string;
     EXP: string;
+    Event_2025LR_StructuresEpicMonsters: string;
+    Event_ARAM_ClearInvisObjects: string;
+    Event_ARAM_Hexgates: string;
+    Event_Brawl_Jungle: string;
+    Event_Brawl_Minions: string;
+    Event_S1_A1_AprilFools_Dragon: string;
+    Event_S1_A1_AprilFools_Snowball: string;
+    Event_S1_A2_AprilFools_Dragon: string;
+    Event_S1_A2_AprilFools_Garen_Play: string;
+    Event_S1_A2_AprilFools_Garen_Takedown: string;
+    Event_S1_A2_AprilFools_Snowball: string;
+    Event_S1_A2_Arena_BraveryChampions: string;
+    Event_S1_A2_Arena_NoxianChampions: string;
+    Event_S1_A2_Arena_ReviveAllies: string;
+    Event_S1_A2_Esports_TakedownEpicMonstersSingleGame: string;
+    Event_S1_A2_Mordekaiser: string;
+    Event_S2A2Champ_Damage: string;
+    Event_S2A2_Exalted: string;
+    Event_S2A2_MV: string;
     FRIENDLY_DAMPEN_LOST: string;
     FRIENDLY_HQ_LOST: string;
     FRIENDLY_TURRET_LOST: string;
@@ -39,6 +80,7 @@ export interface Rolf1PlayerStats {
     GOLD_EARNED: string;
     GOLD_SPENT: string;
     HOLD_PINGS: string;
+    HORDE_KILLS: string;
     HQ_KILLED: string;
     HQ_TAKEDOWNS: string;
     ID: string;
@@ -58,6 +100,7 @@ export interface Rolf1PlayerStats {
     LARGEST_CRITICAL_STRIKE: string;
     LARGEST_KILLING_SPREE: string;
     LARGEST_MULTI_KILL: string;
+    LAST_TAKEDOWN_TIME: string;
     LEVEL: string;
     LONGEST_TIME_SPENT_LIVING: string;
     MAGIC_DAMAGE_DEALT_PLAYER: string;
@@ -65,6 +108,55 @@ export interface Rolf1PlayerStats {
     MAGIC_DAMAGE_TAKEN: string;
     MINIONS_KILLED: string;
     MUTED_ALL: string;
+    Missions_CannonMinionsKilled: string;
+    Missions_ChampionTakedownsWhileGhosted: string;
+    Missions_ChampionTakedownsWithIgnite: string;
+    Missions_ChampionsHitWithAbilitiesEarlyGame: string;
+    Missions_ChampionsKilled: string;
+    Missions_CreepScore: string;
+    Missions_CreepScoreBy10Minutes: string;
+    Missions_Crepe_DamageDealtSpeedZone: string;
+    Missions_Crepe_SnowballLanded: string;
+    Missions_Crepe_TakedownsWithInhibBuff: string;
+    Missions_DamageToChampsWithItems: string;
+    Missions_DamageToStructures: string;
+    Missions_DestroyPlants: string;
+    Missions_DominationRune: string;
+    Missions_GoldFromStructuresDestroyed: string;
+    Missions_GoldFromTurretPlatesTaken: string;
+    Missions_GoldPerMinute: string;
+    Missions_HealingFromLevelObjects: string;
+    Missions_HexgatesUsed: string;
+    Missions_ImmobilizeChampions: string;
+    Missions_InspirationRune: string;
+    Missions_LegendaryItems: string;
+    Missions_MinionsKilled: string;
+    Missions_PeriodicDamage: string;
+    Missions_PlaceUsefulControlWards: string;
+    Missions_PlaceUsefulWards: string;
+    Missions_PorosFed: string;
+    Missions_PrecisionRune: string;
+    Missions_ResolveRune: string;
+    Missions_SnowballsHit: string;
+    Missions_SorceryRune: string;
+    Missions_TakedownBaronsElderDragons: string;
+    Missions_TakedownDragons: string;
+    Missions_TakedownEpicMonsters: string;
+    Missions_TakedownEpicMonstersSingleGame: string;
+    Missions_TakedownGold: string;
+    Missions_TakedownStructures: string;
+    Missions_TakedownWards: string;
+    Missions_TakedownsAfterExhausting: string;
+    Missions_TakedownsAfterTeleporting: string;
+    Missions_TakedownsBefore15Min: string;
+    Missions_TakedownsUnderTurret: string;
+    Missions_TakedownsWithHelpFromMonsters: string;
+    Missions_TimeSpentActivelyPlaying: string;
+    Missions_TotalGold: string;
+    Missions_TrueDamageToStructures: string;
+    Missions_TurretPlatesDestroyed: string;
+    Missions_TwoChampsKilledWithSameAbility: string;
+    Missions_VoidMitesSummoned: string;
     NAME: string;
     NEED_VISION_PINGS: string;
     NEUTRAL_MINIONS_KILLED: string;
@@ -115,6 +207,8 @@ export interface Rolf1PlayerStats {
     PLAYER_AUGMENT_2: string;
     PLAYER_AUGMENT_3: string;
     PLAYER_AUGMENT_4: string;
+    PLAYER_AUGMENT_5: string;
+    PLAYER_AUGMENT_6: string;
     PLAYER_POSITION: string;
     PLAYER_ROLE: string;
     PLAYER_SCORE_0: string;
@@ -136,6 +230,8 @@ export interface Rolf1PlayerStats {
     QUADRA_KILLS: string;
     RETREAT_PINGS: string;
     RIFT_HERALD_KILLS: string;
+    RIOT_ID_GAME_NAME: string;
+    RIOT_ID_TAG_LINE: string;
     SIGHT_WARDS_BOUGHT_IN_GAME: string;
     SKIN: string;
     SPELL1_CAST: string;
@@ -145,8 +241,12 @@ export interface Rolf1PlayerStats {
     STAT_PERK_0: string;
     STAT_PERK_1: string;
     STAT_PERK_2: string;
+    SUMMONER_ID: string;
+    SUMMONER_SPELL_1: string;
+    SUMMONER_SPELL_2: string;
     SUMMON_SPELL1_CAST: string;
     SUMMON_SPELL2_CAST: string;
+    SeasonalMissions_TakedownAtakhan: string;
     TEAM: string;
     TEAM_EARLY_SURRENDERED: string;
     TEAM_OBJECTIVE: string;
@@ -189,4 +289,7 @@ export interface Rolf1PlayerStats {
     WAS_LEAVER: string;
     WAS_SURRENDER_DUE_TO_AFK: string;
     WIN: string;
+    WeeklyMission_S2_DamagingAbilities: string;
+    WeeklyMission_S2_FeatsOfStrength: string;
+    WeeklyMission_S2_SpiritPetals: string;
 }

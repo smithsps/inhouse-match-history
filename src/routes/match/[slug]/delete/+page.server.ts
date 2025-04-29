@@ -30,26 +30,27 @@ async function checkMatchExists(platform: Readonly<App.Platform>, matchHash: str
 async function deleteMatch(platform: Readonly<App.Platform>, matchHash: string): Promise<void> {
   await platform.env.DB.prepare("DELETE FROM matches WHERE file_hash = ?").bind(matchHash).run();
 
-  const bucketName = env.R2_BUCKET_NAME;
-  const region = "us-east-1";
-  const accessKeyId = env.R2_ACCESS_KEY_ID;
-  const secretAccessKey = env.R2_SECRET_ACCESS_KEY;
+  // Don't actually delete the file from R2, just incase we need to revert
+  // const bucketName = env.R2_BUCKET_NAME;
+  // const region = "us-east-1";
+  // const accessKeyId = env.R2_ACCESS_KEY_ID;
+  // const secretAccessKey = env.R2_SECRET_ACCESS_KEY;
 
-  const s3 = new S3Client({
-    region,
-    endpoint: `https://${bucketName}.r2.cloudflarestorage.com`,
-    credentials: {
-      accessKeyId,
-      secretAccessKey,
-    },
-    requestChecksumCalculation: "WHEN_REQUIRED",
-    responseChecksumValidation: "WHEN_REQUIRED",
-  });
+  // const s3 = new S3Client({
+  //   region,
+  //   endpoint: `https://${bucketName}.r2.cloudflarestorage.com`,
+  //   credentials: {
+  //     accessKeyId,
+  //     secretAccessKey,
+  //   },
+  //   requestChecksumCalculation: "WHEN_REQUIRED",
+  //   responseChecksumValidation: "WHEN_REQUIRED",
+  // });
 
-  const deleteParams = {
-    Bucket: "inhouse-replay-files",
-    Key: `${matchHash}`,
-  };
+  // const deleteParams = {
+  //   Bucket: "inhouse-replay-files",
+  //   Key: `${matchHash}`,
+  // };
 
-  await s3.send(new DeleteObjectCommand(deleteParams));
+  // await s3.send(new DeleteObjectCommand(deleteParams));
 }

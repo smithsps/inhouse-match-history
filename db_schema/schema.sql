@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS matches (
     file_hash TEXT NOT NULL,
     match_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     data JSONB NOT NULL,
+    draft_data JSONB,
+    mvp_player TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -25,3 +27,6 @@ CREATE TABLE IF NOT EXISTS sessions (
     user_id INTEGER NOT NULL REFERENCES user(id),
     expires_at INTEGER NOT NULL
 );
+
+ALTER TABLE matches ADD COLUMN draft_data JSONB;
+ALTER TABLE matches ADD COLUMN mvp_player TEXT;
