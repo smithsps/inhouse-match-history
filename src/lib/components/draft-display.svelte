@@ -1,15 +1,28 @@
 <script lang="ts">
     import type { DraftState } from "$lib/models/draft.js";
-    import { getChampionImage, initializeDdragon } from "$lib/services/ddragon";
+    import { initializeDdragon } from "$lib/services/ddragon";
     import { onMount } from 'svelte';
 
     let { draftState } = $props<{
         draftState: DraftState;
     }>();
 
-    onMount(async () => {
-        await initializeDdragon();
+    let ddragon = $state({
+        championImages: {},
+        summonerSpellImages: {}
     });
+
+    onMount(async () => {
+        ddragon = await initializeDdragon();
+    });
+
+    function getChampionImage(championId: string): string {
+        return ddragon.championImages[championId.toLowerCase()] || '';
+    }
+
+    function getSummonerSpellImage(spellId: string): string {
+        return ddragon.summonerSpellImages[spellId] || '';
+    }
 </script>
 
 <div class="grid grid-cols-2 gap-4">

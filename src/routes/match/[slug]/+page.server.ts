@@ -2,9 +2,6 @@ import { redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "../$types";
 import type { Match } from "../../proxy+page.server";
 import type { ROFL } from "$lib/services/parseRofl";
-import { DeleteObjectCommand, GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { env } from "$env/dynamic/private";
 import type { DraftState } from "$lib/models/draft";
 
 

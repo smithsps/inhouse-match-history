@@ -1,10 +1,8 @@
 <script lang="ts">
     import DraftDisplay from '$lib/components/draft-display.svelte';
-    import type { DraftState } from '$lib/models/draft.js';
     import type { RoflMetadata, RoflPlayerStats } from '$lib/models/rofl.js';
-    import type { ROFL } from '$lib/services/parseRofl';
     import { onMount } from 'svelte';
-    import { getChampionImage, getSummonerSpellImage, initializeDdragon } from '$lib/services/ddragon';
+    import { initializeDdragon } from '$lib/services/ddragon';
 
     let { data } = $props();
     let user = $derived(data.user);
@@ -14,10 +12,23 @@
     let metadata: RoflMetadata = $derived(match.metadata as RoflMetadata);
     const draft = $derived(storedMatch.draft_data);
 
+    let ddragon = $state({
+        championImages: {},
+        summonerSpellImages: {}
+    });
+
     // Initialize Data Dragon
     onMount(async () => {
-        await initializeDdragon();
+        ddragon = await initializeDdragon();
     });
+
+    function getChampionImage(championId: string): string {
+        return ddragon.championImages[championId.toLowerCase()] || '';
+    }
+
+    function getSummonerSpellImage(spellId: string): string {
+        return ddragon.summonerSpellImages[spellId] || '';
+    }
 
     const getGameLength = (gameLength: number) => {
         const minutes = Math.floor(gameLength / 1000 / 60);
