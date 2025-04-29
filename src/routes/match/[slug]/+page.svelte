@@ -1,48 +1,23 @@
 <script lang="ts">
+    import DraftDisplay from '$lib/components/draft-display.svelte';
+    import type { DraftState } from '$lib/models/draft.js';
     import type { RoflMetadata, RoflPlayerStats } from '$lib/models/rofl.js';
     import type { ROFL } from '$lib/services/parseRofl';
     import { onMount } from 'svelte';
+    import { getChampionImage, getSummonerSpellImage, initializeDdragon } from '$lib/services/ddragon';
 
     let { data } = $props();
     let user = $derived(data.user);
 
     const storedMatch = $derived(data.match);
-    const match = $derived(storedMatch.data as ROFL);
+    const match = $derived(storedMatch.data);
     let metadata: RoflMetadata = $derived(match.metadata as RoflMetadata);
+    const draft = $derived(storedMatch.draft_data);
 
-    let championImages: Record<string, string> = $state({});
-    let summonerSpellImages: Record<string, string> = $state({});
-
-    // Fetch champion and summoner spell data from Data Dragon API
+    // Initialize Data Dragon
     onMount(async () => {
-        const versionResponse = await fetch('https://ddragon.leagueoflegends.com/api/versions.json');
-        const versions = await versionResponse.json();
-        const latestVersion = versions[0];
-
-        // Fetch champion data
-        const championsResponse = await fetch(`https://ddragon.leagueoflegends.com/cdn/${latestVersion}/data/en_US/champion.json`);
-        const championsData = await championsResponse.json();
-        championImages = Object.fromEntries(
-            Object.entries(championsData.data).map(([key, value]: [string, any]) => [
-                value.id.toLowerCase(),
-                `https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/champion/${value.image.full}`
-            ])
-        );
-
-        // Fetch summoner spell data
-        const spellsResponse = await fetch(`https://ddragon.leagueoflegends.com/cdn/${latestVersion}/data/en_US/summoner.json`);
-        const spellsData = await spellsResponse.json();
-        summonerSpellImages = Object.fromEntries(
-            Object.entries(spellsData.data).map(([key, value]: [string, any]) => [
-                value.key,
-                `https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/spell/${value.image.full}`
-            ])
-        );
+        await initializeDdragon();
     });
-
-    // Helper functions
-    const getChampionImage = (championId: string) => championImages[championId.toLowerCase()] || '';
-    const getSummonerSpellImage = (spellId: string) => summonerSpellImages[spellId] || '';
 
     const getGameLength = (gameLength: number) => {
         const minutes = Math.floor(gameLength / 1000 / 60);
@@ -110,11 +85,6 @@
         </div>
     </div>
 </div>
-
-/**
-{"blueName":"IHQ Blue: 80e5f1e6","redName":"IHQ Red: 80e5f1e6","disabledTurns":[],"disabledChamps":[],"timePerPick":"30","timePerBan":"30","bluePicks":["Chogath","Kayn","Caitlyn","Nautilus","Anivia"],"redPicks":["Yorick","Thresh","Azir","Smolder","Ahri"],"blueBans":["Bard","Hwei","Ekko","Sivir","Urgot"],"redBans":["Leona","Sejuani","Xerath","Milio","Blitzcrank"],"nextTeam":"none","nextType":"none","nextTimeout":0,"blueReady":true,"redReady":true,"state":"finished","turn":20}
-**/
-
 
 <div class="grid grid-cols-2 gap-0">
     <!-- Blue Team -->
@@ -248,8 +218,13 @@
         </table>
     </div>
 
-    <div class="col-span-2 mt-8">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">Detailed Player Stats</h2>
+    {#if storedMatch.draft_data}
+        <div class="col-span-2 my-4">
+            <DraftDisplay draftState={draft} />
+        </div>
+    {/if}
+
+    <div class="col-span-2 mt-4">
         <div class="grid grid-cols-2 gap-6">
             {#each ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as position}
             {#each ["100", "200"] as team}

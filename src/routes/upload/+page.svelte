@@ -1,6 +1,7 @@
 <script lang="ts">
     import MatchPreview from "$lib/components/match-preview.svelte";
     import DraftScraper from "$lib/components/draft-scraper.svelte";
+    import DraftDisplay from "$lib/components/draft-display.svelte";
     import type { DraftState } from "$lib/models/draft.js";
     import type { ROFL } from "$lib/services/parseRofl";
     import { parseRofl } from "$lib/services/parseRofl";
@@ -68,11 +69,15 @@
             />
         </div>
 
+        <DraftScraper onDraftScraped={handleDraftScraped} />
+
         {#if draftState}
             <input type="hidden" name="draft-state" value={JSON.stringify(draftState)} />
+            
+            <div class="w-100">
+                <DraftDisplay draftState={draftState} />
+            </div>
         {/if}
-
-        <DraftScraper onDraftScraped={handleDraftScraped} />
 
         <MatchPreview matchInfo={matchInfo} slug={null} />
         <subtitle class="text-sm text-gray-500">This is a preview of the match data extracted from the replay file.</subtitle>

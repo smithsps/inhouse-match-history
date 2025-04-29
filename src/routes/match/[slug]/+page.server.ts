@@ -5,6 +5,7 @@ import type { ROFL } from "$lib/services/parseRofl";
 import { DeleteObjectCommand, GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { env } from "$env/dynamic/private";
+import type { DraftState } from "$lib/models/draft";
 
 
 export const load: PageServerLoad = async ({ platform, params, locals }) => {
@@ -34,6 +35,7 @@ async function retrieveMatch(platform: Readonly<App.Platform>, matchHash: string
   const match = {
     ...result,
     data: JSON.parse(result.data as any) as ROFL,
+    draft_data: JSON.parse(result.draft_data as any) as DraftState
   }
 
   return match;
