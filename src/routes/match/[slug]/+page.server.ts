@@ -1,9 +1,8 @@
 import { redirect } from "@sveltejs/kit";
-import type { PageServerLoad } from "../$types";
-import type { Match } from "../../proxy+page.server";
-import type { ROFL } from "$lib/services/parseRofl";
+import type { PageServerLoad } from "./$types";
 import type { DraftState } from "$lib/models/draft";
-
+import type { Match } from "$lib/models/match";
+import type { ROFL } from "$lib/models/rofl";
 
 export const load: PageServerLoad = async ({ platform, params, locals }) => {
     if (!params.slug) {

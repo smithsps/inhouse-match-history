@@ -27,6 +27,3 @@ CREATE TABLE IF NOT EXISTS sessions (
     user_id INTEGER NOT NULL REFERENCES user(id),
     expires_at INTEGER NOT NULL
 );
-
-ALTER TABLE matches ADD COLUMN draft_data JSONB;
-ALTER TABLE matches ADD COLUMN mvp_player TEXT;

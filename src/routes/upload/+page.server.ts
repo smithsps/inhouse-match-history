@@ -8,6 +8,8 @@ export const load: PageServerLoad = async ({ locals }) => {
     if (!locals.user) {
         throw redirect(303, '/login');
     }
+
+    return {}
 };
 
 export const actions = {

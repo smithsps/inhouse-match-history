@@ -1,7 +1,7 @@
 <script lang="ts">
     import MatchPreview from '$lib/components/match-preview.svelte';
+    import type { Match } from '$lib/models/match';
     import type { PageProps } from './$types';
-    import type { Match } from './proxy+page.server';
 
     let { data }: PageProps = $props();
     let matches: Match[] = $derived(data.matches); // Matches from the page props
@@ -18,7 +18,6 @@
         })
     );
 </script>
-
 
 <div>
     <input
@@ -47,7 +46,7 @@
                 <div class="text-xs text-gray-500">{match.data.gameVersion}</div>
             </div>
         </a>
-        <MatchPreview matchInfo={match.data} slug={match.file_hash} />
+        <MatchPreview matchInfo={match.data} slug={match.file_hash} ddragon={data.ddragon} />
     </div>
     {/each}
 </div>

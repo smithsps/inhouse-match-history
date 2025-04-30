@@ -3,10 +3,11 @@ import type { PageServerLoad } from './$types';
 import type { Match } from '../lib/models/match';
 
 export const load: PageServerLoad = async ({ platform, locals }) => {
-	return {
-		matches: await retrieveMatches(platform!),
+
+  return {
+    matches: await retrieveMatches(platform!),
     user: locals.user
-	};
+  };
 };
 
 async function retrieveMatches(platform: Readonly<App.Platform>): Promise<Match[]> {

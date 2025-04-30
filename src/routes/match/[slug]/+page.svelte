@@ -1,8 +1,6 @@
 <script lang="ts">
     import DraftDisplay from '$lib/components/draft-display.svelte';
     import type { RoflMetadata, RoflPlayerStats } from '$lib/models/rofl.js';
-    import { onMount } from 'svelte';
-    import { initializeDdragon } from '$lib/services/ddragon';
 
     let { data } = $props();
     let user = $derived(data.user);
@@ -11,24 +9,7 @@
     const match = $derived(storedMatch.data);
     let metadata: RoflMetadata = $derived(match.metadata as RoflMetadata);
     const draft = $derived(storedMatch.draft_data);
-
-    let ddragon = $state({
-        championImages: {},
-        summonerSpellImages: {}
-    });
-
-    // Initialize Data Dragon
-    onMount(async () => {
-        ddragon = await initializeDdragon();
-    });
-
-    function getChampionImage(championId: string): string {
-        return ddragon.championImages[championId.toLowerCase()] || '';
-    }
-
-    function getSummonerSpellImage(spellId: string): string {
-        return ddragon.summonerSpellImages[spellId] || '';
-    }
+    let ddragon = $derived(data.ddragon);
 
     const getGameLength = (gameLength: number) => {
         const minutes = Math.floor(gameLength / 1000 / 60);
@@ -65,6 +46,7 @@
     };
 </script>
 
+{#if storedMatch}
 <div>
     <div class="text-sm text-gray-500 mb-2">
         <div class="flex items-center space-x-4 text-gray-700 ml-2">
@@ -126,19 +108,19 @@
                         <td class="px-2 py-1 flex items-center">
                             <img
                                 class="w-6 h-6 rounded-sm mr-2"
-                                src={getChampionImage(player.SKIN)}
+                                src={ddragon.getChampionImage(player.SKIN)}
                                 alt="{player.SKIN}"
                             />
                             <div class="flex items-center">
                                 <img
                                     class="w-5 h-5"
                                     style="margin-bottom: 1px;"
-                                    src={getSummonerSpellImage(player.SUMMONER_SPELL_1)}
+                                    src={ddragon.getSummonerSpellImage(player.SUMMONER_SPELL_1)}
                                     alt="Summoner Spell 1"
                                 />
                                 <img
                                     class="w-5 h-5 mr-2"
-                                    src={getSummonerSpellImage(player.SUMMONER_SPELL_2)}
+                                    src={ddragon.getSummonerSpellImage(player.SUMMONER_SPELL_2)}
                                     alt="Summoner Spell 2"
                                 />
                                 <span class="font-medium text-gray-700 truncate">{player.RIOT_ID_GAME_NAME || player.NAME}</span>
@@ -191,19 +173,19 @@
                         <td class="px-2 py-1 flex items-center">
                             <img
                                 class="w-6 h-6 rounded-sm mr-2"
-                                src={getChampionImage(player.SKIN)}
+                                src={ddragon.getChampionImage(player.SKIN)}
                                 alt="{player.SKIN}"
                             />
                             <div class="flex items-center">
                                 <img
                                     class="w-5 h-5"
                                     style="margin-bottom: 1px;"
-                                    src={getSummonerSpellImage(player.SUMMONER_SPELL_1)}
+                                    src={ddragon.getSummonerSpellImage(player.SUMMONER_SPELL_1)}
                                     alt="Summoner Spell 1"
                                 />
                                 <img
                                     class="w-5 h-5 mr-2"
-                                    src={getSummonerSpellImage(player.SUMMONER_SPELL_2)}
+                                    src={ddragon.getSummonerSpellImage(player.SUMMONER_SPELL_2)}
                                     alt="Summoner Spell 2"
                                 />
                                 <span class="font-medium text-gray-700 truncate">{player.RIOT_ID_GAME_NAME || player.NAME}</span>
@@ -231,7 +213,7 @@
 
     {#if storedMatch.draft_data}
         <div class="col-span-2 my-4">
-            <DraftDisplay draftState={draft} />
+            <DraftDisplay draftState={draft} ddragon={ddragon} />
         </div>
     {/if}
 
@@ -244,7 +226,7 @@
                 <div class="flex items-center mb-4">
                     <img
                         class="w-12 h-12 rounded-full mr-4"
-                        src={getChampionImage(player.SKIN)}
+                        src={ddragon.getChampionImage(player.SKIN)}
                         alt="{player.SKIN}"
                     />
                     <div>
@@ -291,3 +273,4 @@
         </div>
     </div>
 </div>
+{/if}

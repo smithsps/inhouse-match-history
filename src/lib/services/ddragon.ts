@@ -1,10 +1,12 @@
 
-interface DdragongRepository {
+export interface DdragongRepository {
     championImages: Record<string, string>;
     summonerSpellImages: Record<string, string>;
+    getChampionImage: (championId: string) => string;
+    getSummonerSpellImage: (spellId: string) => string;
 };
 
-export async function initializeDdragon() : Promise<DdragongRepository> {
+export async function initializeDdragon(fetch: (url: string) => Promise<Response>) : Promise<DdragongRepository> {
     const versionResponse = await fetch('https://ddragon.leagueoflegends.com/api/versions.json');
     const versions = await versionResponse.json();
     const latestVersion = versions[0];
@@ -32,5 +34,7 @@ export async function initializeDdragon() : Promise<DdragongRepository> {
     return {
         championImages,
         summonerSpellImages,
+        getChampionImage: (championId: string) => championImages[championId.toLowerCase()] || '',
+        getSummonerSpellImage: (spellId: string) => summonerSpellImages[spellId] || ''
     };
 }

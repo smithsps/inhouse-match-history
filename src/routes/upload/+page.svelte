@@ -3,10 +3,11 @@
     import DraftScraper from "$lib/components/draft-scraper.svelte";
     import DraftDisplay from "$lib/components/draft-display.svelte";
     import type { DraftState } from "$lib/models/draft.js";
-    import type { ROFL } from "$lib/services/parseRofl";
     import { parseRofl } from "$lib/services/parseRofl";
+    import type { ROFL } from "$lib/models/rofl.js";
 
-    let { form } = $props();
+    let { form, data } = $props();
+    let ddragon = $derived(data.ddragon);
 
     let matchInfo: ROFL | undefined = $state(undefined);
     let draftState: DraftState | undefined = $state(undefined);
@@ -42,7 +43,7 @@
 
     function handleDraftScraped(draft: DraftState) {
         draftState = draft;
-        matchInfo.draftState = draftState;
+        matchInfo!.draftState = draftState;
     }
 </script>
 
@@ -75,11 +76,11 @@
             <input type="hidden" name="draft-state" value={JSON.stringify(draftState)} />
             
             <div class="w-100">
-                <DraftDisplay draftState={draftState} />
+                <DraftDisplay draftState={draftState} ddragon={ddragon} />
             </div>
         {/if}
 
-        <MatchPreview matchInfo={matchInfo} slug={null} />
+        <MatchPreview matchInfo={matchInfo} slug={null} ddragon={ddragon} />
         <subtitle class="text-sm text-gray-500">This is a preview of the match data extracted from the replay file.</subtitle>
         <!-- Submit button-->
         <button class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 w-50" type="submit">

@@ -1,46 +1,18 @@
 <script lang="ts">
-    import type { Rolf1PlayerStats } from '$lib/models/rofl-version1';
-    import type { RoflMetadata, RoflPlayerStats } from '$lib/models/rofl';
-    import type { ROFL } from '$lib/services/parseRofl';
-    import { onMount } from 'svelte';
+    import type { Match } from '$lib/models/match';
+    import type { ROFL, RoflMetadata, RoflPlayerStats } from '$lib/models/rofl';
+    import type { DdragongRepository } from '$lib/services/ddragon';
 
-    let {matchInfo, slug} = $props();
+    let {matchInfo, slug, ddragon} = $props<{
+        matchInfo: ROFL;
+        slug: string | null;
+        ddragon: DdragongRepository;
+    }>();
 
     let match: RoflMetadata = $derived(matchInfo.metadata);
 
     let championImages: Record<string, string> = $state({});
     let summonerSpellImages: Record<string, string> = $state({});
-
-    // Fetch champion and summoner spell data from Data Dragon API
-    onMount(async () => {
-        const versionResponse = await fetch('https://ddragon.leagueoflegends.com/api/versions.json');
-        const versions = await versionResponse.json();
-        const latestVersion = versions[0];
-
-        // Fetch champion data
-        const championsResponse = await fetch(`https://ddragon.leagueoflegends.com/cdn/${latestVersion}/data/en_US/champion.json`);
-        const championsData = await championsResponse.json();
-        championImages = Object.fromEntries(
-            Object.entries(championsData.data).map(([key, value]: [string, any]) => [
-                value.id.toLowerCase(),
-                `https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/champion/${value.image.full}`
-            ])
-        );
-
-        // Fetch summoner spell data
-        const spellsResponse = await fetch(`https://ddragon.leagueoflegends.com/cdn/${latestVersion}/data/en_US/summoner.json`);
-        const spellsData = await spellsResponse.json();
-        summonerSpellImages = Object.fromEntries(
-            Object.entries(spellsData.data).map(([key, value]: [string, any]) => [
-                value.key,
-                `https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/spell/${value.image.full}`
-            ])
-        );
-    });
-
-    // Helper functions
-    const getChampionImage = (championId: string) => championImages[championId.toLowerCase()] || '';
-    const getSummonerSpellImage = (spellId: string) => summonerSpellImages[spellId] || '';
 
     const getGameLength = (gameLength: number) => {
         const minutes = Math.floor(gameLength / 1000 / 60);
@@ -106,19 +78,19 @@
                         <td class="px-2 py-1 flex items-center">
                             <img
                                 class="w-6 h-6 rounded-sm mr-2"
-                                src={getChampionImage(player.SKIN)}
+                                src={ddragon.getChampionImage(player.SKIN)}
                                 alt="{player.SKIN}"
                             />
                             <div class="flex items-center">
                                 <img
                                     class="w-5 h-5"
                                     style="margin-bottom: 1px;"
-                                    src={getSummonerSpellImage(player.SUMMONER_SPELL_1)}
+                                    src={ddragon.getSummonerSpellImage(player.SUMMONER_SPELL_1)}
                                     alt="Summoner Spell 1"
                                 />
                                 <img
                                     class="w-5 h-5 mr-2"
-                                    src={getSummonerSpellImage(player.SUMMONER_SPELL_2)}
+                                    src={ddragon.getSummonerSpellImage(player.SUMMONER_SPELL_2)}
                                     alt="Summoner Spell 2"
                                 />
                                 <span class="font-medium text-gray-700 truncate">{player.RIOT_ID_GAME_NAME || player.NAME}</span>
@@ -171,19 +143,19 @@
                         <td class="px-2 py-1 flex items-center">
                             <img
                                 class="w-6 h-6 rounded-sm mr-2"
-                                src={getChampionImage(player.SKIN)}
+                                src={ddragon.getChampionImage(player.SKIN)}
                                 alt="{player.SKIN}"
                             />
                             <div class="flex items-center">
                                 <img
                                     class="w-5 h-5"
                                     style="margin-bottom: 1px;"
-                                    src={getSummonerSpellImage(player.SUMMONER_SPELL_1)}
+                                    src={ddragon.getSummonerSpellImage(player.SUMMONER_SPELL_1)}
                                     alt="Summoner Spell 1"
                                 />
                                 <img
                                     class="w-5 h-5 mr-2"
-                                    src={getSummonerSpellImage(player.SUMMONER_SPELL_2)}
+                                    src={ddragon.getSummonerSpellImage(player.SUMMONER_SPELL_2)}
                                     alt="Summoner Spell 2"
                                 />
                                 <span class="font-medium text-gray-700 truncate">{player.RIOT_ID_GAME_NAME || player.NAME}</span>
