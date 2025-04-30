@@ -275,7 +275,7 @@
                                         <div class="ml-auto">
                                             <h4 class="text-right text-sm font-medium text-gray-500 mb-2">Recent Games</h4>
                                             <div class="flex space-x-1">
-                                                {#each player.matchResults.slice(-5).reverse() as result}
+                                                {#each player.matchResults.slice(-5) as result}
                                                     <div class={`w-8 h-8 rounded ${result === 'W' ? 'bg-green-100' : 'bg-red-100'} flex items-center justify-center text-xs ${result === 'W' ? 'text-green-600' : 'text-red-600'}`}>
                                                         {result}
                                                     </div>

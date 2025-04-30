@@ -50,25 +50,17 @@ export type LeaderboardPositionStats = {
 }
 
 async function getLeaderboard(platform: Readonly<App.Platform>): Promise<LeaderboardPlayer[]> {
-    const query = `
-      SELECT * FROM matches;
-    `;
-    const result = await platform.env.DB.prepare(query).all<Match>();
+    const result = await platform.env.DB.prepare("SELECT * FROM matches").all<Match>();
 
     const matches: Match[] = result.results.map((m: Match) => ({
         ...m,
         data: JSON.parse(m.data as any) as ROFL,
     })).sort((a, b) => {
-        // Attempt to parse match_id as a number for sorting
-        const a_matchid = parseInt(a.match_id.split('_')[1]);
-        const b_matchid = parseInt(b.match_id.split('_')[1]);
-
-        return b_matchid - a_matchid;
+        // Sort from highest to lowest match id ex: NA_12434352
+        return parseInt(b.match_id.split('_')[1]) - parseInt(a.match_id.split('_')[1]);
     });
 
     const players = new Map<string, LeaderboardPlayer>();
-
-    console.log(matches);
 
     matches.forEach(match => {
         match.data.metadata.statsJson.forEach((player: RoflPlayerStats, index: number) => {
@@ -125,8 +117,8 @@ function getWinRate(player: LeaderboardPlayer): number {
 
 function getWinOrLossStreak(player: LeaderboardPlayer): string {
     let streak = 0;
-    let lastResult = player.matchResults[player.matchResults.length - 1];
-    for (let i = player.matchResults.length - 1; i >= 0; i--) {
+    let lastResult = player.matchResults[0];
+    for (let i = 0; i < player.matchResults.length; i++) {
         if (player.matchResults[i] === lastResult) {
             streak++;
         } else {
