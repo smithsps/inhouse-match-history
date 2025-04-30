@@ -211,7 +211,11 @@ function calculatePositionStats(positions: LeaderboardPositionResult[]): Leaderb
     positionStats.forEach(position => {
         positions.forEach(positionResult => {
             if (positionResult.name === position.name) {
-                position.wins++;
+                if (positionResult.win) {
+                    position.wins++;
+                } else {
+                    position.losses++;
+                }
             }
         });
     });
