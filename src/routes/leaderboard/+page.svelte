@@ -11,8 +11,6 @@
     let sortField = $state<keyof LeaderboardPlayer | 'games' | 'winRate' | 'name'>('wins');
     let sortDirection = $state<'asc' | 'desc'>('desc');
 
-    $inspect(leaderboard);
-
     function toggleExpand(playerId: string) {
         expandedPlayer = expandedPlayer === playerId ? null : playerId;
     }

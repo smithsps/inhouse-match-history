@@ -51,26 +51,19 @@ export type LeaderboardPositionStats = {
 
 async function getLeaderboard(platform: Readonly<App.Platform>): Promise<LeaderboardPlayer[]> {
     const query = `
-      SELECT * FROM matches
-      ORDER BY match_date DESC;
-  `;
+      SELECT * FROM matches;
+    `;
     const result = await platform.env.DB.prepare(query).all<Match>();
 
     const matches: Match[] = result.results.map((m: Match) => ({
         ...m,
         data: JSON.parse(m.data as any) as ROFL,
     })).sort((a, b) => {
-        try {
-            // Attempt to parse match_id as a number for sorting
-            const a_matchid = parseInt(a.match_id.split('_')[1]);
-            const b_matchid = parseInt(b.match_id.split('_')[1]);
+        // Attempt to parse match_id as a number for sorting
+        const a_matchid = parseInt(a.match_id.split('_')[1]);
+        const b_matchid = parseInt(b.match_id.split('_')[1]);
 
-            return b_matchid - a_matchid;
-        }
-        catch (error) {
-            // Sort to end
-            return 1
-        }
+        return b_matchid - a_matchid;
     });
 
     const players = new Map<string, LeaderboardPlayer>();
