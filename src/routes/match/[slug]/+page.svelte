@@ -50,21 +50,19 @@
 <div>
     <div class="text-sm text-gray-500 mb-2">
         <div class="flex items-center space-x-4 text-gray-700 ml-2">
-            <div class="text-xs font-medium text-gray-500">{new Date(match.date).toLocaleDateString()}</div>
-            <div class="text-xs text-gray-500">{new Date(match.date).toLocaleTimeString()}</div>
+            <div class="text-xs font-medium text-gray-500">{new Date(storedMatch.match_date).toLocaleDateString()}</div>
+            <div class="text-xs text-gray-500">{new Date(storedMatch.match_date).toLocaleTimeString()}</div>
             <div class="text-xs text-gray-500">{storedMatch.match_id}</div>
             <div class="text-xs text-gray-500">{match.gameVersion}</div>
             <div class="ml-auto"></div>
             {#if user?.is_admin}
             <button
-                class="text-xs text-red-500 hover:underline border border-red-500 rounded px-2 py-1 cursor-pointer"
+                class="text-xs text-green-600 hover:underline border border-green-600 rounded px-2 py-1 cursor-pointer"
                 onclick={() => {
-                    if (confirm('Are you sure you want to delete this match?')) {
-                        window.location.href = `/match/${storedMatch.file_hash}/delete`;
-                    }
+                    window.location.href = `/match/${storedMatch.file_hash}/edit`;
                 }}
             >
-                Delete Match
+                Edit Match
             </button>
             {/if}
 

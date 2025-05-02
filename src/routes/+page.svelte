@@ -40,8 +40,8 @@
     <div class="mb-3 rounded-lg">
         <a href={`/match/${match.file_hash}`} class="text-sm text-gray-500 mb-2">
             <div class="flex items-center space-x-4 text-gray-700 ml-2">
-                <div class="text-xs font-medium text-gray-500">{new Date(match.data.date).toLocaleDateString()}</div>
-                <div class="text-xs text-gray-500">{new Date(match.data.date).toLocaleTimeString()}</div>
+                <div class="text-xs font-medium text-gray-500">{new Date(match.match_date).toLocaleDateString()}</div>
+                <div class="text-xs text-gray-500">{new Date(match.match_date).toLocaleTimeString()}</div>
                 <div class="text-xs text-gray-500">{match.match_id}</div>
                 <div class="text-xs text-gray-500">{match.data.gameVersion}</div>
             </div>
