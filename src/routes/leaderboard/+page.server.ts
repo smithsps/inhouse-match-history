@@ -14,13 +14,30 @@ export type LeaderboardPlayer = {
     rank: number;
     wins: number;
     losses: number;
-    matchResults: string[];
+    matchResults: MatchResult[];
     positions: LeaderboardPositionResult[];
     positionStats: LeaderboardPositionStats[];
     champions: Record<string, LeaderboardChampionStats>;
     topChampions: LeaderboardChampionStats[];
     winRate?: number;
     streak?: string;
+}
+
+export type MatchResult = {
+    matchId: string;
+    win: boolean;
+    champion: string;
+    kills: number;
+    deaths: number;
+    assists: number;
+    creepScore: number;
+    creepScorePerMinute: number;
+    goldEarned: number;
+    damageDealt: number;
+    damageTaken: number;
+    gameLength: number;
+    date: string;
+    position: string;
 }
 
 export type LeaderboardChampionStats = {
@@ -81,12 +98,30 @@ async function getLeaderboard(platform: Readonly<App.Platform>): Promise<Leaderb
             }
 
             const existingPlayer = players.get(playerid)!;
-            existingPlayer.wins += player.WIN === "Win" ? 1 : 0;
-            existingPlayer.losses += player.WIN === "Win" ? 0 : 1;
-            existingPlayer.matchResults.push(player.WIN === "Win" ? "W" : "L");
+            const isWin = player.WIN === "Win";
+            existingPlayer.wins += isWin ? 1 : 0;
+            existingPlayer.losses += isWin ? 0 : 1;
+            
+            existingPlayer.matchResults.push({
+                matchId: match.match_id,
+                win: isWin,
+                champion: player.SKIN,
+                kills: Number(player.CHAMPIONS_KILLED),
+                deaths: Number(player.NUM_DEATHS),
+                assists: Number(player.ASSISTS),
+                creepScore: Number(player.MINIONS_KILLED) + Number(player.NEUTRAL_MINIONS_KILLED),
+                creepScorePerMinute: roundUi((Number(player.MINIONS_KILLED) + Number(player.NEUTRAL_MINIONS_KILLED)) / (match.data.metadata.gameLength / 1000 / 60)),
+                goldEarned: Number(player.GOLD_EARNED),
+                damageDealt: Number(player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS),
+                damageTaken: Number(player.TOTAL_DAMAGE_TAKEN),
+                gameLength: match.data.metadata.gameLength,
+                date: match.match_date,
+                position: player.TEAM_POSITION
+            });
+            
             existingPlayer.positions.push({
                 name: player.TEAM_POSITION,
-                win: player.WIN === "Win"
+                win: isWin
             });
             updateChampionStats(existingPlayer, player, match.data.metadata.gameLength);
         })
@@ -116,16 +151,20 @@ function getWinRate(player: LeaderboardPlayer): number {
 }   
 
 function getWinOrLossStreak(player: LeaderboardPlayer): string {
+    if (player.matchResults.length === 0) return '';
+    
     let streak = 0;
-    let lastResult = player.matchResults[0];
-    for (let i = 0; i < player.matchResults.length; i++) {
-        if (player.matchResults[i] === lastResult) {
+    const lastResult = player.matchResults[0].win;
+    
+    for (const match of player.matchResults) {
+        if (match.win === lastResult) {
             streak++;
         } else {
             break;
         }
     }
-    return `${lastResult}${streak}`;
+    
+    return `${lastResult ? 'W' : 'L'}${streak}`;
 }
 
 function updateChampionStats(player: LeaderboardPlayer, playerStats: RoflPlayerStats, matchDuration: number) {
@@ -152,7 +191,7 @@ function updateChampionStats(player: LeaderboardPlayer, playerStats: RoflPlayerS
     player.champions[champion].kills += Number(playerStats.CHAMPIONS_KILLED);
     player.champions[champion].deaths += Number(playerStats.NUM_DEATHS);
     player.champions[champion].assists += Number(playerStats.ASSISTS);
-    player.champions[champion].creepScore += Number(playerStats.MINIONS_KILLED);
+    player.champions[champion].creepScore += Number(playerStats.MINIONS_KILLED) + Number(playerStats.NEUTRAL_MINIONS_KILLED);
     player.champions[champion].minutesPlayed += matchDuration / 1000 / 60;
 }
 
