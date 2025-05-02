@@ -270,7 +270,7 @@
                                                 <div class="grid grid-cols-6 gap-4">
                                                     {#each ['TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY'] as position}
                                                         {@const posStats = player.positionStats.find((p: LeaderboardPositionStats) => p.name === position)}
-                                                        <div class="col-span-2 bg-gray-100 rounded-lg p-4 text-center hover:bg-gray-200 transition-colors">
+                                                        <div class="col-span-2 bg-gray-100 rounded-lg p-4 text-center">
                                                             <div class="text-sm font-medium text-gray-600 mb-2">{position}</div>
                                                             {#if posStats}
                                                                 <div class="text-base tabular-nums text-gray-900">
