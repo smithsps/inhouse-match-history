@@ -294,39 +294,44 @@
                                             <div class="flex-1 px-6">
                                                 <div class="space-y-3">
                                                     {#each player.matchResults.slice(0, 5) as match}
-                                                        <div 
-                                                            class={`
-                                                                p-1 rounded-lg flex items-center gap-4
-                                                                ${match.win ? 'bg-green-50' : 'bg-red-50'}
-                                                                ${match.win ? 'ring-2 ring-green-100' : 'ring-2 ring-red-100'}
-                                                            `}
+                                                        <a 
+                                                            href="/match/{match.fileHash}"
+                                                            class="block hover:opacity-90 transition-opacity"
                                                         >
-                                                            <div class={`font-medium text-xs ${match.win ? 'text-green-600' : 'text-red-600'} mr-1 ml-2`}>
-                                                                {match.win ? 'Win' : 'Loss'}
-                                                            </div>
-                                                            <div class="w-8 h-8 flex-shrink-0">
-                                                                <img src={ddragon.getChampionImage(match.champion)} alt={match.champion} class="w-8 h-8 rounded-md" />
-                                                            </div>
-                                                            <div class="flex-1 min-w-0">
-                                                                <div class="grid grid-cols-3 justify-between text-xs text-gray-900 font-medium">
-                                                                    <div>
-                                                                        <span class="text-sm font-semibold ">{match.kills}</span>
-                                                                        <span class="text-gray-500">/</span>
-                                                                        <span class="text-sm font-semibold tabular-nums">{match.deaths}</span>
-                                                                        <span class="text-gray-500">/</span>
-                                                                        <span class="text-sm font-semibold tabular-nums">{match.assists}</span>
+                                                            <div 
+                                                                class={`
+                                                                    p-1 rounded-lg flex items-center gap-4
+                                                                    ${match.win ? 'bg-green-50 hover:bg-green-100' : 'bg-red-50 hover:bg-red-100'}
+                                                                    ${match.win ? 'ring-2 ring-green-100' : 'ring-2 ring-red-100'}
+                                                                `}
+                                                            >
+                                                                <div class={`font-medium text-xs ${match.win ? 'text-green-600' : 'text-red-600'} mr-1 ml-2`}>
+                                                                    {match.win ? 'Win' : 'Loss'}
+                                                                </div>
+                                                                <div class="w-8 h-8 flex-shrink-0">
+                                                                    <img src={ddragon.getChampionImage(match.champion)} alt={match.champion} class="w-8 h-8 rounded-md" />
+                                                                </div>
+                                                                <div class="flex-1 min-w-0">
+                                                                    <div class="grid grid-cols-3 justify-between text-xs text-gray-900 font-medium">
+                                                                        <div>
+                                                                            <span class="text-sm font-semibold ">{match.kills}</span>
+                                                                            <span class="text-gray-500">/</span>
+                                                                            <span class="text-sm font-semibold tabular-nums">{match.deaths}</span>
+                                                                            <span class="text-gray-500">/</span>
+                                                                            <span class="text-sm font-semibold tabular-nums">{match.assists}</span>
+                                                                        </div>
+                                                                        <div class="col-span-2 self-center">
+                                                                            <span class="text-gray-600 tabular-nums">CS {match.creepScore} ({match.creepScorePerMinute})</span>
+                                                                        </div>
                                                                     </div>
-                                                                    <div class="col-span-2 self-center">
-                                                                        <span class="text-gray-600 tabular-nums">CS {match.creepScore} ({match.creepScorePerMinute})</span>
+                                                                    <div class="text-xs text-gray-500 grid grid-cols-4 gap-2 mt-1">
+                                                                        <span class="font-medium">{match.position}</span>
+                                                                        <span class="col-auto text-center">{Math.floor(match.gameLength / 1000 / 60)}m</span>
+                                                                        <span class="text-right">{new Date(match.date).toLocaleDateString()}</span>
                                                                     </div>
                                                                 </div>
-                                                                <div class="text-xs text-gray-500 grid grid-cols-4 gap-2 mt-1">
-                                                                    <span class="font-medium">{match.position}</span>
-                                                                    <span class="col-auto text-center">{Math.floor(match.gameLength / 1000 / 60)}m</span>
-                                                                    <span class="text-right">{new Date(match.date).toLocaleDateString()}</span>
-                                                                </div>
                                                             </div>
-                                                        </div>
+                                                        </a>
                                                     {/each}
                                                 </div>
                                             </div>

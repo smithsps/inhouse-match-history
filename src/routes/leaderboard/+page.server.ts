@@ -25,6 +25,7 @@ export type LeaderboardPlayer = {
 
 export type MatchResult = {
     matchId: string;
+    fileHash: string;
     win: boolean;
     champion: string;
     kills: number;
@@ -104,6 +105,7 @@ async function getLeaderboard(platform: Readonly<App.Platform>): Promise<Leaderb
             
             existingPlayer.matchResults.push({
                 matchId: match.match_id,
+                fileHash: match.file_hash,
                 win: isWin,
                 champion: player.SKIN,
                 kills: Number(player.CHAMPIONS_KILLED),
