@@ -1,6 +1,7 @@
 <script lang="ts">
     import MatchPreview from '$lib/components/match-preview.svelte';
     import type { Match } from '$lib/models/match';
+    import { PlayerService } from '$lib/services/player';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
@@ -13,6 +14,7 @@
             return match.data.metadata.statsJson.some(player => 
                 player.NAME.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 player.RIOT_ID_GAME_NAME.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                PlayerService.getPlayerNameWithAsterisk(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME).toLowerCase().includes(searchQuery.toLowerCase()) ||
                 player.SKIN.toLowerCase().includes(searchQuery.toLowerCase())
             );
         })

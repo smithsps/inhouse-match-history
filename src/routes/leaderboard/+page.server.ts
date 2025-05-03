@@ -1,5 +1,6 @@
 import type { Match } from "$lib/models/match";
 import type { ROFL, RoflMetadata, RoflPlayerStats } from "$lib/models/rofl";
+import { PlayerService } from "$lib/services/player";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ platform }) => {
@@ -82,12 +83,12 @@ async function getLeaderboard(platform: Readonly<App.Platform>): Promise<Leaderb
 
     matches.forEach(match => {
         match.data.metadata.statsJson.forEach((player: RoflPlayerStats, index: number) => {
-            const playerid = player.PUUID;
+            const playerid = PlayerService.getPlayerPuuid(player.PUUID);
             if (!players.has(playerid)) {
                 players.set(playerid, {
                     id: playerid,
                     rank: -1,
-                    name: player.RIOT_ID_GAME_NAME,
+                    name: PlayerService.getPlayerName(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME),
                     wins: 0,
                     losses: 0,
                     matchResults: [],

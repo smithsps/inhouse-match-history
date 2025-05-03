@@ -1,6 +1,7 @@
 <script lang="ts">
     import DraftDisplay from '$lib/components/draft-display.svelte';
     import type { RoflMetadata, RoflPlayerStats } from '$lib/models/rofl.js';
+    import { PlayerService } from '$lib/services/player.js';
 
     let { data } = $props();
     let user = $derived(data.user);
@@ -121,7 +122,7 @@
                                     src={ddragon.getSummonerSpellImage(player.SUMMONER_SPELL_2)}
                                     alt="Summoner Spell 2"
                                 />
-                                <span class="font-medium text-gray-700 truncate">{player.RIOT_ID_GAME_NAME || player.NAME}</span>
+                                <span class="font-medium text-gray-700 truncate">{@html PlayerService.getPlayerNameWithAsterisk(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME)}</span>
                             </div>
                         </td>
                         <td class="px-2 py-1 text-gray-600">{player.CHAMPIONS_KILLED}/{player.NUM_DEATHS}/{player.ASSISTS}</td>
@@ -186,7 +187,7 @@
                                     src={ddragon.getSummonerSpellImage(player.SUMMONER_SPELL_2)}
                                     alt="Summoner Spell 2"
                                 />
-                                <span class="font-medium text-gray-700 truncate">{player.RIOT_ID_GAME_NAME || player.NAME}</span>
+                                <span class="font-medium text-gray-700 truncate">{@html PlayerService.getPlayerNameWithAsterisk(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME)}</span>
                             </div>
                         </td>
                         <td class="px-2 py-1 text-gray-600">{player.CHAMPIONS_KILLED}/{player.NUM_DEATHS}/{player.ASSISTS}</td>
@@ -228,7 +229,7 @@
                         alt="{player.SKIN}"
                     />
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900">{player.RIOT_ID_GAME_NAME || player.NAME}</h3>
+                        <h3 class="text-lg font-semibold text-gray-900">{@html PlayerService.getPlayerNameWithAsterisk(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME)}</h3>
                         <p class="text-sm text-gray-500">{player.TEAM_POSITION}</p>
                     </div>
                 </div>

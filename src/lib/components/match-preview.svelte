@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { ROFL, RoflMetadata, RoflPlayerStats } from '$lib/models/rofl';
     import type { DdragongRepository } from '$lib/services/ddragon';
+    import { PlayerService } from '$lib/services/player';
 
     let {matchInfo, slug, ddragon} = $props<{
         matchInfo: ROFL;
@@ -90,7 +91,7 @@
                                         src={ddragon.getSummonerSpellImage(player.SUMMONER_SPELL_2)}
                                         alt="Summoner Spell 2"
                                     />
-                                    <span class="font-medium text-gray-700 truncate">{player.RIOT_ID_GAME_NAME || player.NAME}</span>
+                                    <span class="font-medium text-gray-700 truncate">{@html PlayerService.getPlayerNameWithAsterisk(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME)}</span>
                                 </div>
                             </td>
                             <td class="px-2 py-1 text-gray-600">{player.CHAMPIONS_KILLED}/{player.NUM_DEATHS}/{player.ASSISTS}</td>
