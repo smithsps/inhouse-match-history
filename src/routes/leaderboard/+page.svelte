@@ -79,9 +79,9 @@
     }
 </script>
 
-<main class="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="text-center mb-12">
+<main class="min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="text-center mb-8">
             <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight mb-3">Leaderboard</h1>
         </div>
         

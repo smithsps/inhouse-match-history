@@ -32,6 +32,12 @@
         return minions + jungle;
     };
 
+    const formatCsPerMinute = (player: RoflPlayerStats) => {
+        const cs = parseInt(player.MINIONS_KILLED) + parseInt(player.NEUTRAL_MINIONS_KILLED);
+        const minutes = match.gameLength / 1000 / 60;
+        return Math.round((cs / minutes * 10))/ 10;
+    };
+
     const calculateDamagePercentage = (player: RoflPlayerStats) => {
         const damage = parseInt(player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS);
         const max = Math.max(...match.statsJson.map(p => parseInt(p.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS)));
@@ -47,33 +53,33 @@
     });
 </script>
 
-<div class="grid grid-cols-2 gap-0">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
     {#each teams as team}
         <div class="bg-{team.bgColor}-50 p-2 rounded-md shadow-sm">
-            <table class="table-auto w-full text-xs text-left">
-                <thead>
-                    <tr 
-                        class="bg-{team.bgColor}-200 text-gray-700 font-semibold cursor-pointer"
-                        onclick={() => window.location.href = `/match/${slug}`}
+            <div class="w-full text-xs">
+                <div class="grid grid-cols-[auto_auto_auto_auto_auto_auto] gap-0 items-center">
+                    {#if slug}
+                    <a 
+                        class="bg-{team.bgColor}-200 text-gray-700 font-semibold px-2 py-1 col-span-6"
+                        href={slug ? `/match/${slug}` : ''}
                     >
-                        <th colspan="6" class="px-2 py-1">
+                        {isMatchWinner(team.id) ? 'Victory' : 'Defeat'} | {gameLengthFormatted}
+                    </a>
+                    {:else}
+                        <div class="bg-{team.bgColor}-200 text-gray-700 font-semibold px-2 py-1 col-span-6">
                             {isMatchWinner(team.id) ? 'Victory' : 'Defeat'} | {gameLengthFormatted}
-                        </th>
-                    </tr>
-                    <tr class="bg-{team.bgColor}-100 text-gray-500 font-medium">
-                        <th class="px-2 py-1">Player</th>
-                        <th class="px-2 py-1">K/D/A</th>
-                        <th class="px-2 py-1">Gold</th>
-                        <th class="px-2 py-1">Damage</th>
-                        <th class="px-2 py-1">Wards</th>
-                        <th class="px-2 py-1">CS</th>
-                    </tr>
-                </thead>
-                <tbody>
+                        </div>
+                    {/if}
+                    <div class="bg-{team.bgColor}-100 text-gray-500 font-medium px-2 py-1">Player</div>
+                    <div class="bg-{team.bgColor}-100 text-gray-500 font-medium px-2 py-1">KDA</div>
+                    <div class="bg-{team.bgColor}-100 text-gray-500 font-medium px-2 py-1">Gold</div>
+                    <div class="bg-{team.bgColor}-100 text-gray-500 font-medium px-2 py-1">Damage</div>
+                    <div class="bg-{team.bgColor}-100 text-gray-500 font-medium px-2 py-1">Wards</div>
+                    <div class="bg-{team.bgColor}-100 text-gray-500 font-medium px-2 py-1">CS</div>
+                    
                     {#each ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as position}
-                    {#each match.statsJson.filter(player => player.TEAM === team.id && player.TEAM_POSITION === position) as player}
-                        <tr class="border-b">
-                            <td class="px-2 py-1 flex items-center">
+                        {#each match.statsJson.filter(player => player.TEAM === team.id && player.TEAM_POSITION === position) as player}
+                            <div class="px-2 py-1 flex items-center">
                                 <img
                                     class="w-6 h-6 rounded-sm mr-2"
                                     src={ddragon.getChampionImage(player.SKIN)}
@@ -93,25 +99,28 @@
                                     />
                                     <span class="font-medium text-gray-700 truncate">{@html PlayerService.getPlayerNameWithAsterisk(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME)}</span>
                                 </div>
-                            </td>
-                            <td class="px-2 py-1 text-gray-600">{player.CHAMPIONS_KILLED}/{player.NUM_DEATHS}/{player.ASSISTS}</td>
-                            <td class="px-2 py-1 text-gray-600">{formatGold(player.GOLD_EARNED)}</td>
-                            <td class="px-2 py-1 text-gray-600">
+                            </div>
+                            <div class="px-2 py-1 text-gray-600">{player.CHAMPIONS_KILLED}/{player.NUM_DEATHS}/{player.ASSISTS}</div>
+                            <div class="px-2 py-1 text-gray-600">{formatGold(player.GOLD_EARNED)}</div>
+                            <div class="px-2 py-1 text-gray-600">
                                 {player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS}
-                                <div class="relative w-full h-1 bg-gray-200 rounded mt-1">
+                                <div class="relative w-full h-1 bg-gray-200 rounded">
                                     <div
                                         class="absolute top-0 left-0 h-full bg-{team.bgColor}-500 rounded"
                                         style="width: {calculateDamagePercentage(player)}%;"
                                     ></div>
                                 </div>
-                            </td>
-                            <td class="px-2 py-1 text-gray-600">{player.WARD_PLACED} / {player.WARD_KILLED} / {player.VISION_WARDS_BOUGHT_IN_GAME}</td>
-                            <td class="px-2 py-1 text-gray-600">{formatCs(player)}</td>
-                        </tr>
+                            </div>
+                            <div class="px-2 py-1 text-gray-600" title="Vision Wards Bought - Wards Placed / Wards Killed">
+                                {player.VISION_WARDS_BOUGHT_IN_GAME} <span class="text-gray-400 text-xs"> - </span> {player.WARD_PLACED}/{player.WARD_KILLED}
+                            </div>
+                            <div class="px-2 py-1 text-gray-600">
+                                {formatCs(player)} <span class="text-gray-500 text-xs">({formatCsPerMinute(player)})</span>
+                            </div>
+                        {/each}
                     {/each}
-                    {/each}
-                </tbody>
-            </table>
+                </div>
+            </div>
         </div>
     {/each}
 </div>

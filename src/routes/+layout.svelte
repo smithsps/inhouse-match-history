@@ -24,7 +24,7 @@
 			</nav>
 		</div>
 	</header>
-	<main class="flex-grow p-4 w-6xl mx-auto">
+	<main class="flex-grow p-4 w-full md:w-10/12 lg:w-6xl mx-auto">
 		{@render children()}
 	</main>
 </div>
