@@ -5,6 +5,7 @@
   import type { SubmitFunction } from '@sveltejs/kit';
   import DraftScraper from '$lib/components/draft-scraper.svelte';
   import DraftDisplay from '$lib/components/draft-display.svelte';
+  import MatchPreview from '$lib/components/match-preview.svelte';
   import type { DraftState } from '$lib/models/draft';
 
   let { data } = $props<{ data: PageData & { match: Match; ddragon: any } }>();
@@ -68,7 +69,12 @@
     >
     Back to Match
   </a>
+  
   <h1 class="text-2xl font-bold mb-6">Edit Match</h1>
+
+  <div class="mb-8">
+    <MatchPreview matchInfo={match.data} slug={match.file_hash} ddragon={data.ddragon} />
+  </div>
 
   {#if error}
     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">

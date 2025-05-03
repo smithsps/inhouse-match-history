@@ -44,6 +44,12 @@
                 <div class="text-xs text-gray-500">{new Date(match.match_date).toLocaleTimeString()}</div>
                 <div class="text-xs text-gray-500">{match.match_id}</div>
                 <div class="text-xs text-gray-500">{match.data.gameVersion}</div>
+                {#if match.draft_data}
+                    <div class="text-xs text-gray-500 flex items-center">
+                        <span class="text-lg icon-[material-symbols--check-rounded]"></span>
+                        Draft included
+                    </div>
+                {/if}
             </div>
         </a>
         <MatchPreview matchInfo={match.data} slug={match.file_hash} ddragon={data.ddragon} />
