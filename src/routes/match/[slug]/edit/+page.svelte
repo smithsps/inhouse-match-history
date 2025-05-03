@@ -11,7 +11,7 @@
   let match = $derived(data.match);
   let error: string | null = $state(null);
   let success: string | null = $state(null);
-  let draftState: DraftState | undefined = $derived(match.draft_data);
+  let draftState: DraftState | undefined = $state(undefined);
 
   function handleDraftScraped(draft: DraftState) {
     match.draft_data = draft;

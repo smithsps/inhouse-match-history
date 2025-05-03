@@ -34,7 +34,19 @@ export async function initializeDdragon(fetch: (url: string) => Promise<Response
     return {
         championImages,
         summonerSpellImages,
-        getChampionImage: (championId: string) => championImages[championId.toLowerCase()] || '',
-        getSummonerSpellImage: (spellId: string) => summonerSpellImages[spellId] || ''
+        getChampionImage: (championId: string | undefined) => {
+            if (!championId || typeof championId !== 'string') {
+                return '';
+            }
+
+            return championImages[championId.toLowerCase()] || '';
+        },
+        getSummonerSpellImage: (spellId: string | undefined) => {
+            if (!spellId) {
+                return '';
+            }
+
+            return summonerSpellImages[spellId] || '';
+        }
     };
 }
