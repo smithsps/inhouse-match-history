@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { LeaderboardPlayer, LeaderboardPositionStats } from './+page.server';
-    
-    const { data } = $props<{ data: { leaderboard: LeaderboardPlayer[] } }>();
+
+    const { data } = $props<{ data: { leaderboard: LeaderboardPlayer[], ddragon: any } }>();
     const ddragon = $derived(data.ddragon);
 
 
@@ -80,268 +80,433 @@
 </script>
 
 <main class="min-h-screen">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mx-auto lg:px-8 py-8">
         <div class="text-center mb-8">
             <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight mb-3">Leaderboard</h1>
         </div>
         
-        <div class="bg-white rounded-xl overflow-hidden shadow-xl border border-gray-100">
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="bg-gray-50/80 text-sm text-gray-600 uppercase tracking-tight border-b border-gray-200">
-                            <th class="sticky top-0 w-16 px-6 py-4 text-left font-semibold">#</th>
-                            <th 
-                                class="sticky top-0 w-64 px-6 py-4 text-left font-semibold cursor-pointer hover:bg-gray-100 transition-colors group"
-                                onclick={() => handleSort('name')}
-                            >
-                                <div class="flex items-center gap-2">
-                                    Player
-                                    <span class={`${getSortIcon('name')} w-5 h-5 text-gray-400 group-hover:text-gray-600`}></span>
-                                </div>
-                            </th>
-                            <th 
-                                class="sticky top-0 w-24 px-6 py-4 text-center font-semibold cursor-pointer hover:bg-gray-100 transition-colors group"
-                                onclick={() => handleSort('wins')}
-                            >
-                                <div class="flex items-center justify-center gap-2">
-                                    Wins
-                                    <span class={`${getSortIcon('wins')} w-5 h-5 text-gray-400 group-hover:text-gray-600`}></span>
-                                </div>
-                            </th>
-                            <th 
-                                class="sticky top-0 w-24 px-6 py-4 text-center font-semibold cursor-pointer hover:bg-gray-100 transition-colors group"
-                                onclick={() => handleSort('losses')}
-                            >
-                                <div class="flex items-center justify-center gap-2">
-                                    Losses
-                                    <span class={`${getSortIcon('losses')} w-5 h-5 text-gray-400 group-hover:text-gray-600`}></span>
-                                </div>
-                            </th>
-                            <th 
-                                class="sticky top-0 px-6 py-4 text-center font-semibold cursor-pointer hover:bg-gray-100 transition-colors group"
-                                onclick={() => handleSort('games')}
-                            >
-                                <div class="flex items-center justify-center gap-2">
-                                    Games
-                                    <span class={`${getSortIcon('games')} w-5 h-5 text-gray-400 group-hover:text-gray-600`}></span>
-                                </div>
-                            </th>
-                            <th 
-                                class="sticky top-0 w-48 px-6 py-4 text-center font-semibold cursor-pointer hover:bg-gray-100 transition-colors group"
-                                onclick={() => handleSort('winRate')}
-                            >
-                                <div class="flex items-center justify-center gap-2">
-                                    Win Rate
-                                    <span class={`${getSortIcon('winRate')} w-5 h-5 text-gray-400 group-hover:text-gray-600`}></span>
-                                </div>
-                            </th>
-                            <th class="sticky top-0 w-24 px-6 py-4 text-center font-semibold">Streak</th>
-                            <th class="sticky top-0 w-8"></th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        {#each sortedLeaderboard as player, index}
-                            <tr 
-                                class="hover:bg-blue-50/30 transition-colors cursor-pointer group"
-                                onclick={() => toggleExpand(player.id)}
-                                onkeydown={(e) => handleKeydown(e, player.id)}
-                                tabindex="0"
-                                role="button"
-                            >
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-lg font-bold text-gray-900">{player.rank}</span>
-                                        {#if player.rank <= 3}
-                                            <span class="text-lg">
-                                                {player.rank === 1 ? '🥇' : player.rank === 2 ? '🥈' : '🥉'}
-                                            </span>
-                                        {/if}
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center space-x-3 text-gray-900">
-                                        <div class="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center overflow-hidden">
-                                            <img 
-                                                src={ddragon.getChampionImage(player.topChampions[0].name)} 
-                                                alt={player.topChampions[0].name} 
-                                                class="rounded-full"
-                                                style="transform: scale(1.1);"
-                                            />
-                                        </div>
-                                        <div>
-                                            <div class="font-medium text-gray-900">{player.name}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-center tabular-nums text-green-600">
-                                    {player.wins}
-                                </td>
-                                <td class="px-6 py-4 text-center tabular-nums text-red-600">
-                                    {player.losses}
-                                </td>
-                                <td class="px-6 py-4 text-center tabular-nums text-gray-900">
-                                    {player.wins + player.losses}
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center justify-center">
-                                        <div class="w-full bg-gray-200 rounded-full h-2 mr-2">
-                                            <div 
-                                                class="bg-blue-500 h-2 rounded-full" 
-                                                style="width: {getWinRate(player.wins, player.losses)}%"
-                                            ></div>
-                                        </div>
-                                        <span class="text-sm tabular-nums w-12 text-right text-gray-900">
-                                            {getWinRate(player.wins, player.losses)}%
-                                        </span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-center tabular-nums">
-                                    <span class={player.streak.startsWith('W') ? 'text-green-600' : 'text-red-600'}>
-                                        {player.streak}
+        <div class="bg-white rounded-xl shadow-xl border border-gray-100">
+            <div class="hidden md:block">
+                <div class="grid grid-cols-[1fr_2fr_1fr_1fr_1fr_2fr_1fr_2rem] w-full">
+                    <div class="contents sticky top-0 z-10 bg-gray-50/80 border-b border-gray-200">
+                        <div class="px-6 py-4 text-left font-semibold text-sm text-gray-600 uppercase tracking-tight">#</div>
+                        <div 
+                            class="w-64 px-6 py-4 text-left font-semibold cursor-pointer hover:bg-gray-100 transition-colors group text-sm text-gray-600 uppercase tracking-tight"
+                            onclick={() => handleSort('name')}
+                            role="button"
+                            tabindex="0"
+                            onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSort('name') }}
+                        >
+                            <div class="flex items-center gap-2">
+                                Player
+                                <span class={`${getSortIcon('name')} w-5 h-5 text-gray-400 group-hover:text-gray-600`}></span>
+                            </div>
+                        </div>
+                        <div 
+                            class="px-6 py-4 text-center font-semibold cursor-pointer hover:bg-gray-100 transition-colors group text-sm text-gray-600 uppercase tracking-tight"
+                            onclick={() => handleSort('wins')}
+                            role="button"
+                            tabindex="0"
+                            onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSort('wins') }}
+                        >
+                            <div class="flex items-center justify-center gap-2">
+                                Wins
+                                <span class={`${getSortIcon('wins')} w-5 h-5 text-gray-400 group-hover:text-gray-600`}></span>
+                            </div>
+                        </div>
+                        <div 
+                            class="px-6 py-4 text-center font-semibold cursor-pointer hover:bg-gray-100 transition-colors group text-sm text-gray-600 uppercase tracking-tight"
+                            onclick={() => handleSort('losses')}
+                            role="button"
+                            tabindex="0"
+                            onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSort('losses') }}
+                        >
+                            <div class="flex items-center justify-center gap-2">
+                                Losses
+                                <span class={`${getSortIcon('losses')} w-5 h-5 text-gray-400 group-hover:text-gray-600`}></span>
+                            </div>
+                        </div>
+                        <div 
+                            class="px-6 py-4 text-center font-semibold cursor-pointer hover:bg-gray-100 transition-colors group text-sm text-gray-600 uppercase tracking-tight"
+                            onclick={() => handleSort('games')}
+                            role="button"
+                            tabindex="0"
+                            onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSort('games') }}
+                        >
+                            <div class="flex items-center justify-center gap-2">
+                                Games
+                                <span class={`${getSortIcon('games')} w-5 h-5 text-gray-400 group-hover:text-gray-600`}></span>
+                            </div>
+                        </div>
+                        <div 
+                            class="px-6 py-4 text-center font-semibold cursor-pointer hover:bg-gray-100 transition-colors group text-sm text-gray-600 uppercase tracking-tight"
+                            onclick={() => handleSort('winRate')}
+                            role="button"
+                            tabindex="0"
+                            onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSort('winRate') }}
+                        >
+                            <div class="flex items-center justify-center gap-2">
+                                Win Rate
+                                <span class={`${getSortIcon('winRate')} w-5 h-5 text-gray-400 group-hover:text-gray-600`}></span>
+                            </div>
+                        </div>
+                        <div class="px-6 py-4 text-center font-semibold text-sm text-gray-600 uppercase tracking-tight">Streak</div>
+                        <div class=""></div>
+                    </div>
+
+                    {#each sortedLeaderboard as player, index (player.id)}
+                        <div 
+                            class="contents group hover:bg-blue-50/30 transition-colors cursor-pointer border-b border-gray-100 last:border-b-0"
+                            onclick={() => toggleExpand(player.id)}
+                            onkeydown={(e) => handleKeydown(e, player.id)}
+                            tabindex="0"
+                            role="button"
+                            aria-expanded={expandedPlayer === player.id}
+                            aria-controls={`details-${player.id}`}
+                        >
+                            <div class="px-6 py-4 flex items-center gap-2 group-hover:bg-blue-50/30">
+                                <span class="text-lg font-bold text-gray-900">{player.rank}</span>
+                                {#if player.rank <= 3}
+                                    <span class="text-lg">
+                                        {player.rank === 1 ? '🥇' : player.rank === 2 ? '🥈' : '🥉'}
                                     </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <svg 
-                                        class={`w-4 h-4 transform transition-transform duration-200 ${expandedPlayer === player.id ? 'rotate-180' : ''} text-gray-400`}
-                                        fill="none" 
-                                        stroke="currentColor" 
-                                        viewBox="0 0 24 24"
-                                        aria-hidden="true"
-                                    >
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </td>
-                            </tr>
-                            {#if expandedPlayer === player.id}
-                                <tr class="bg-gray-50/50">
-                                    <td colspan="9" class="px-6 py-6">
-                                        <div class="flex divide-x divide-gray-200">
-                                            <div class="flex-1 px-6 first:pl-0 last:pr-0">
-                                                <div class="space-y-3">
-                                                    {#each player.topChampions as champion}
-                                                        <div class="bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors">
-                                                            <div class="flex items-center gap-2">
-                                                                <div class="w-12 h-12 flex-shrink-0">
-                                                                    <img 
-                                                                        src={ddragon.getChampionImage(champion.name)} 
-                                                                        alt={champion.name}
-                                                                        title={champion.name}
-                                                                        class="w-12 h-12 rounded-md ring-2 ring-gray-200"
-                                                                    />
-                                                                </div>
-                                                                <div class="flex-1">
-                                                                    <div class="grid grid-cols-3 gap-4 mt-2">
-                                                                        <div class="text-center">
-                                                                            <div class="text-xs text-gray-500 mb-1">KDA</div>
-                                                                            <div class="text-sm font-medium text-gray-900">
-                                                                                {champion.kills}/{champion.deaths}/{champion.assists}
-                                                                            </div>
-                                                                            <div class="text-xs text-gray-500 mt-0.5">
-                                                                                {champion.kda}:1
-                                                                            </div>
+                                {/if}
+                            </div>
+                            <div class="px-6 py-4 flex items-center space-x-3 text-gray-900 group-hover:bg-blue-50/30">
+                                <div class="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                                    <img 
+                                        src={ddragon.getChampionImage(player.topChampions[0].name)} 
+                                        alt={player.topChampions[0].name} 
+                                        class="w-full h-full object-cover"
+                                    />
+                                </div>
+                                <div>
+                                    <div class="font-medium text-gray-900">{player.name}</div>
+                                </div>
+                            </div>
+                            <div class="px-6 py-4 text-center tabular-nums text-green-600 group-hover:bg-blue-50/30 flex items-center justify-center">
+                                {player.wins}
+                            </div>
+                            <div class="px-6 py-4 text-center tabular-nums text-red-600 group-hover:bg-blue-50/30 flex items-center justify-center">
+                                {player.losses}
+                            </div>
+                            <div class="px-6 py-4 text-center tabular-nums text-gray-900 group-hover:bg-blue-50/30 flex items-center justify-center">
+                                {player.wins + player.losses}
+                            </div>
+                            <div class="px-6 py-4 group-hover:bg-blue-50/30 flex items-center justify-center">
+                                <div class="w-full flex items-center justify-center">
+                                    <div class="w-full bg-gray-200 rounded-full h-2 mr-2">
+                                        <div 
+                                            class="bg-blue-500 h-2 rounded-full" 
+                                            style="width: {getWinRate(player.wins, player.losses)}%"
+                                        ></div>
+                                    </div>
+                                    <span class="text-sm tabular-nums w-12 text-right text-gray-900">
+                                        {getWinRate(player.wins, player.losses)}%
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="px-6 py-4 text-center tabular-nums group-hover:bg-blue-50/30 flex items-center justify-center">
+                                <span class={player.streak.startsWith('W') ? 'text-green-600' : 'text-red-600'}>
+                                    {player.streak}
+                                </span>
+                            </div>
+                            <div class="py-4 mr-4 flex items-center justify-center group-hover:bg-blue-50/30">
+                                <svg 
+                                    class={`w-4 h-4 transform transition-transform duration-200 ${expandedPlayer === player.id ? 'rotate-180' : ''} text-gray-400`}
+                                    fill="none" 
+                                    stroke="currentColor" 
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                        </div>
+                        
+                        {#if expandedPlayer === player.id}
+                            <div class="col-span-full bg-gray-50/50 border-b border-gray-200" id={`details-${player.id}`}>
+                                <div class="px-6 py-6">
+                                    <div class="flex flex-col lg:flex-row divide-y lg:divide-y-0 lg:divide-x divide-gray-200">
+                                        <div class="flex-1 py-4 lg:px-6 first:pt-0 lg:first:pl-0 last:pb-0 lg:last:pr-0">
+                                            <div class="space-y-3">
+                                                {#each player.topChampions as champion}
+                                                    <div class="bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors">
+                                                        <div class="flex items-center gap-3">
+                                                            <div class="w-12 h-12 flex-shrink-0">
+                                                                <img 
+                                                                    src={ddragon.getChampionImage(champion.name)} 
+                                                                    alt={champion.name}
+                                                                    title={champion.name}
+                                                                    class="w-12 h-12 rounded-md ring-2 ring-gray-200"
+                                                                />
+                                                            </div>
+                                                            <div class="flex-1">
+                                                                <div class="grid grid-cols-3 gap-4">
+                                                                    <div class="text-center">
+                                                                        <div class="text-xs text-gray-500 mb-1">KDA</div>
+                                                                        <div class="text-sm font-medium text-gray-900 tabular-nums">
+                                                                            {champion.kills}/{champion.deaths}/{champion.assists}
                                                                         </div>
-                                                                        <div class="text-center">
-                                                                            <div class="text-xs text-gray-500 mb-1">CS</div>
-                                                                            <div class="text-sm font-medium text-gray-900">
-                                                                                {champion.creepScore}
-                                                                            </div>
-                                                                            <div class="text-xs text-gray-500 mt-0.5">
-                                                                                {champion.creepScorePerMinute}/min
-                                                                            </div>
+                                                                        <div class="text-xs text-gray-500 mt-0.5 tabular-nums">
+                                                                            {champion.kda}:1
                                                                         </div>
-                                                                        <div class="text-center">
-                                                                            <div class="text-xs text-gray-500 mb-1">Win Rate</div>
-                                                                            <div class="text-sm font-medium text-gray-900">
-                                                                                {Math.round((champion.wins / champion.games) * 100)}%
-                                                                            </div>
-                                                                            <div class="text-xs text-gray-500 mt-0.5">
-                                                                                {champion.wins}W {champion.losses}L
-                                                                            </div>
+                                                                    </div>
+                                                                    <div class="text-center">
+                                                                        <div class="text-xs text-gray-500 mb-1">CS</div>
+                                                                        <div class="text-sm font-medium text-gray-900 tabular-nums">
+                                                                            {champion.creepScore}
+                                                                        </div>
+                                                                        <div class="text-xs text-gray-500 mt-0.5 tabular-nums">
+                                                                            {champion.creepScorePerMinute}/min
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="text-center">
+                                                                        <div class="text-xs text-gray-500 mb-1">Win Rate</div>
+                                                                        <div class="text-sm font-medium text-gray-900 tabular-nums">
+                                                                            {Math.round((champion.wins / champion.games) * 100)}%
+                                                                        </div>
+                                                                        <div class="text-xs text-gray-500 mt-0.5 tabular-nums">
+                                                                            {champion.wins}W {champion.losses}L
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    {/each}
-                                                </div>
-                                            </div>
-                                            <div class="flex-1 px-6">
-                                                <div class="grid grid-cols-6 gap-4">
-                                                    {#each ['TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY'] as position}
-                                                        {@const posStats = player.positionStats.find((p: LeaderboardPositionStats) => p.name === position)}
-                                                        <div class="col-span-2 bg-gray-100 rounded-lg p-4 text-center">
-                                                            <div class="text-sm font-medium text-gray-600 mb-2">{position}</div>
-                                                            {#if posStats}
-                                                                <div class="text-base tabular-nums text-gray-900">
-                                                                    {posStats.wins}W {posStats.losses}L
-                                                                </div>
-                                                                <div class="text-sm text-gray-500 tabular-nums mt-1">
-                                                                    {Math.round(posStats.winRate * 100)}%
-                                                                </div>
-                                                            {:else}
-                                                                <div class="text-sm text-gray-400 mt-2">
-                                                                    No games
-                                                                </div>
-                                                            {/if}
-                                                        </div>
-                                                        {#if position === 'MIDDLE'}
-                                                            <div class="cols-span-1"></div>
-                                                        {/if}
-                                                    {/each}
-                                                </div>
-                                            </div>
-                                            <div class="flex-1 px-6">
-                                                <div class="space-y-3">
-                                                    {#each player.matchResults.slice(0, 5) as match}
-                                                        <a 
-                                                            href="/match/{match.fileHash}"
-                                                            class="block hover:opacity-90 transition-opacity"
-                                                        >
-                                                            <div 
-                                                                class={`
-                                                                    p-1 rounded-lg flex items-center gap-4
-                                                                    ${match.win ? 'bg-green-50 hover:bg-green-100' : 'bg-red-50 hover:bg-red-100'}
-                                                                    ${match.win ? 'ring-2 ring-green-100' : 'ring-2 ring-red-100'}
-                                                                `}
-                                                            >
-                                                                <div class={`font-medium text-xs ${match.win ? 'text-green-600' : 'text-red-600'} mr-1 ml-2`}>
-                                                                    {match.win ? 'Win' : 'Loss'}
-                                                                </div>
-                                                                <div class="w-8 h-8 flex-shrink-0">
-                                                                    <img src={ddragon.getChampionImage(match.champion)} alt={match.champion} class="w-8 h-8 rounded-md" />
-                                                                </div>
-                                                                <div class="flex-1 min-w-0">
-                                                                    <div class="grid grid-cols-3 justify-between text-xs text-gray-900 font-medium">
-                                                                        <div>
-                                                                            <span class="text-sm font-semibold ">{match.kills}</span>
-                                                                            <span class="text-gray-500">/</span>
-                                                                            <span class="text-sm font-semibold tabular-nums">{match.deaths}</span>
-                                                                            <span class="text-gray-500">/</span>
-                                                                            <span class="text-sm font-semibold tabular-nums">{match.assists}</span>
-                                                                        </div>
-                                                                        <div class="col-span-2 self-center">
-                                                                            <span class="text-gray-600 tabular-nums">CS {match.creepScore} ({match.creepScorePerMinute})</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="text-xs text-gray-500 grid grid-cols-4 gap-2 mt-1">
-                                                                        <span class="font-medium">{match.position}</span>
-                                                                        <span class="col-auto text-center">{Math.floor(match.gameLength / 1000 / 60)}m</span>
-                                                                        <span class="text-right">{new Date(match.date).toLocaleDateString()}</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </a>
-                                                    {/each}
-                                                </div>
+                                                    </div>
+                                                {/each}
                                             </div>
                                         </div>
-                                    </td>
-                                </tr>
-                            {/if}
-                        {/each}
-                    </tbody>
-                </table>
+                                        <div class="flex-1 lg:px-6 first:pt-0 lg:first:pl-0 last:pb-0 lg:last:pr-0">
+                                            <div class="grid grid-cols-2 gap-3">
+                                                {#each ['TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY'] as position}
+                                                    {@const posStats = player.positionStats.find((p: LeaderboardPositionStats) => p.name === position)}
+                                                    <div class="bg-gray-100 rounded-lg p-3 text-center">
+                                                        <div class="text-xs font-medium text-gray-600 mb-1 uppercase">{position}</div>
+                                                        {#if posStats}
+                                                            <div class="text-sm tabular-nums text-gray-900">
+                                                                {posStats.wins}W {posStats.losses}L
+                                                            </div>
+                                                            <div class="text-xs text-gray-500 tabular-nums mt-0.5">
+                                                                {Math.round(posStats.winRate * 100)}%
+                                                            </div>
+                                                        {:else}
+                                                            <div class="text-xs text-gray-400 italic mt-1">
+                                                                N/A
+                                                            </div>
+                                                        {/if}
+                                                    </div>
+                                                {/each}
+                                            </div>
+                                        </div>
+                                        <div class="flex-1 lg:px-6 first:pt-0 lg:first:pl-0 last:pb-0 lg:last:pr-0">
+                                            <div class="space-y-2">
+                                                {#each player.matchResults.slice(0, 5) as match}
+                                                    <a 
+                                                        href="/match/{match.fileHash}"
+                                                        class="block hover:opacity-80 transition-opacity"
+                                                        aria-label="View match details for match on {new Date(match.date).toLocaleDateString()} playing {match.champion}"
+                                                    >
+                                                        <div 
+                                                            class={`
+                                                                p-2 rounded-lg flex items-center gap-3 text-xs
+                                                                ${match.win ? 'bg-green-100/70' : 'bg-red-100/70'}
+                                                            `}
+                                                        >
+                                                            <div class={`font-semibold w-8 text-center ${match.win ? 'text-green-700' : 'text-red-700'}`}>
+                                                                {match.win ? 'Win' : 'Loss'}
+                                                            </div>
+                                                            <div class="w-8 h-8 flex-shrink-0">
+                                                                <img src={ddragon.getChampionImage(match.champion)} alt={match.champion} class="w-8 h-8 rounded-md" />
+                                                            </div>
+                                                            <div class="flex-1 min-w-0">
+                                                                <div class="flex justify-between items-center text-gray-900 font-medium mb-1">
+                                                                    <div class="whitespace-nowrap tabular-nums">
+                                                                        <span class="font-semibold">{match.kills}</span>
+                                                                        <span class="text-gray-500">/</span>
+                                                                        <span class="font-semibold">{match.deaths}</span>
+                                                                        <span class="text-gray-500">/</span>
+                                                                        <span class="font-semibold">{match.assists}</span>
+                                                                    </div>
+                                                                    <div class="text-gray-600 tabular-nums">
+                                                                        CS {match.creepScore} ({match.creepScorePerMinute})
+                                                                    </div>
+                                                                </div>
+                                                                <div class="flex justify-between text-gray-500">
+                                                                    <span class="font-medium text-xs uppercase">{match.position}</span>
+                                                                    <span>{Math.floor(match.gameLength / 1000 / 60)}m</span>
+                                                                    <span>{new Date(match.date).toLocaleDateString()}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                {/each}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {/if}
+                    {/each}
+                </div>
+            </div>
+
+            <div class="md:hidden">
+                {#each sortedLeaderboard as player, index (player.id)}
+                    <div class="p-4 border-b border-gray-200 last:border-b-0">
+                        <div 
+                            class="flex items-center justify-between cursor-pointer"
+                            onclick={() => toggleExpand(player.id)}
+                            onkeydown={(e) => handleKeydown(e, player.id)}
+                            tabindex="0"
+                            role="button"
+                            aria-expanded={expandedPlayer === player.id}
+                            aria-controls={`mobile-details-${player.id}`}                        
+                        >
+                            <div class="flex items-center space-x-3">
+                                <span class="font-bold w-6 text-center">{player.rank}</span>
+                                <div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
+                                    <img 
+                                        src={ddragon.getChampionImage(player.topChampions[0].name)} 
+                                        alt={player.topChampions[0].name} 
+                                        class="w-full h-full object-cover"
+                                    />
+                                </div>
+                                <span class="font-medium text-gray-900">{player.name}</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm tabular-nums">
+                                    {player.wins}W / {player.losses}L
+                                </span>
+                                <svg 
+                                    class={`w-4 h-4 transform transition-transform duration-200 ${expandedPlayer === player.id ? 'rotate-180' : ''} text-gray-400`}
+                                    fill="none" 
+                                    stroke="currentColor" 
+                                    viewBox="0 0 24 24"
+                                    aria-hidden="true"
+                                >
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                        </div>
+
+                        {#if expandedPlayer === player.id}
+                            <div class="mt-3 pt-3 border-t border-gray-100 space-y-4" id={`mobile-details-${player.id}`}>
+                                <div>
+                                    <div class="space-y-1.5">
+                                        {#each player.topChampions.slice(0, 3) as champion}
+                                            <div class="bg-gray-50 rounded p-2 grid grid-cols-2 gap-2">
+                                                <div class="flex gap-2 mb-1">
+                                                    <div class="w-6 h-6 flex-shrink-0">
+                                                        <img 
+                                                            src={ddragon.getChampionImage(champion.name)} 
+                                                            alt={champion.name}
+                                                            title={champion.name}
+                                                            class="w-6 h-6 rounded ring-1 ring-gray-200"
+                                                        />
+                                                    </div>
+                                                    <div class="font-medium text-sm text-gray-900">{champion.name}</div>
+                                                </div>
+                                                <div class="flex justify-around text-center text-xs">
+                                                    <div>
+                                                        <div class="text-[10px] text-gray-500">KDA</div>
+                                                        <div class="text-xs font-medium text-gray-800 tabular-nums">
+                                                            {champion.kda}:1
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="text-[10px] text-gray-500">CS</div>
+                                                        <div class="text-xs font-medium text-gray-900 tabular-nums">
+                                                            {champion.creepScore} ({champion.creepScorePerMinute})
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="text-[10px] text-gray-500">WR%</div>
+                                                        <div class="text-xs font-medium text-gray-800 tabular-nums">
+                                                            {Math.round((champion.wins / champion.games) * 100)}%
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="text-[10px] text-gray-500">Games</div>
+                                                        <div class="text-xs font-medium text-gray-800 tabular-nums">
+                                                            {champion.wins}W {champion.losses}L
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {/each}
+                                    </div>
+                                </div>
+    
+                                <div>
+                                    <div class="grid grid-cols-5 gap-1.5">
+                                        {#each ['TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY'] as position}
+                                            {@const posStats = player.positionStats.find((p: LeaderboardPositionStats) => p.name === position)}
+                                            <div class="bg-gray-100 rounded p-1.5 text-center">
+                                                <div class="text-[10px] font-medium text-gray-600 mb-0.5 uppercase">{position}</div>
+                                                {#if posStats}
+                                                    <div class="text-xs tabular-nums text-gray-900">
+                                                        {Math.round(posStats.winRate * 100)}%
+                                                    </div>
+                                                    <div class="text-[10px] text-gray-500 tabular-nums">
+                                                        {posStats.wins}W {posStats.losses}L
+                                                    </div>
+                                                {:else}
+                                                    <div class="text-xs text-gray-400 italic">
+                                                        No games
+                                                    </div>
+                                                {/if}
+                                            </div>
+                                        {/each}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="space-y-1">
+                                        {#each player.matchResults.slice(0, 5) as match}
+                                            <a 
+                                                href="/match/{match.fileHash}"
+                                                class="block hover:opacity-80 transition-opacity"
+                                                aria-label="View match details for match on {new Date(match.date).toLocaleDateString()} playing {match.champion}"
+                                            >
+                                                <div 
+                                                    class={`
+                                                        p-1.5 rounded flex items-center gap-2 text-xs
+                                                        ${match.win ? 'bg-green-100/70' : 'bg-red-100/70'}
+                                                    `}
+                                                >
+                                                    <div class={`font-bold w-8 text-center text-[10px] uppercase ${match.win ? 'text-green-700' : 'text-red-700'}`}>
+                                                        {match.win ? 'WIN' : 'LOSS'}
+                                                    </div>
+                                                    <div class="w-5 h-5 flex-shrink-0">
+                                                        <img src={ddragon.getChampionImage(match.champion)} alt={match.champion} class="w-5 h-5 rounded" />
+                                                    </div>
+                                                    <div class="flex-1 min-w-0">
+                                                        <div class="flex justify-between items-center text-gray-900 mb-0.5">
+                                                            <div class="whitespace-nowrap tabular-nums text-xs font-medium">
+                                                                <span class="font-semibold">{match.kills}</span>/<span class="font-semibold">{match.deaths}</span>/<span class="font-semibold">{match.assists}</span>
+                                                            </div>
+                                                            <div class="text-gray-600 tabular-nums">
+                                                                CS {match.creepScore} ({match.creepScorePerMinute})
+                                                            </div>
+                                                            <div class="text-gray-500 text-xs">
+                                                                <span>{new Date(match.date).toLocaleDateString()}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex justify-start gap-2 text-gray-500">
+                                                            <span class="font-medium uppercase">{match.position}</span>
+                                                            <span class="ml-auto">{Math.floor(match.gameLength / 1000 / 60)}m</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        {/each}
+                                    </div>
+                                </div>
+                            </div>
+                        {/if}
+                    </div>
+                {/each}
             </div>
         </div>
     </div>
