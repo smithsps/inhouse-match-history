@@ -50,6 +50,24 @@
         
         return Math.round(((playerKills + playerAssists) / teamKills) * 100);
     };
+
+    // Compute max values for bars
+    const maxStats = $derived(() => {
+        const stats = metadata.statsJson;
+        return {
+            damageDealt: Math.max(...stats.map(p => parseInt(p.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS) || 0)),
+            damageTaken: Math.max(...stats.map(p => parseInt(p.TOTAL_DAMAGE_TAKEN) || 0)),
+            healingDone: Math.max(...stats.map(p => parseInt(p.TOTAL_HEAL) || 0)),
+            gold: Math.max(...stats.map(p => parseInt(p.GOLD_EARNED) || 0)),
+            cs: Math.max(...stats.map(p => parseInt(p.MINIONS_KILLED) + parseInt(p.NEUTRAL_MINIONS_KILLED) || 0)),
+            wardsPlaced: Math.max(...stats.map(p => parseInt(p.WARD_PLACED) || 0)),
+            wardsKilled: Math.max(...stats.map(p => parseInt(p.WARD_KILLED) || 0)),
+            controlWards: Math.max(...stats.map(p => parseInt(p.VISION_WARDS_BOUGHT_IN_GAME) || 0)),
+            objDamage: Math.max(...stats.map(p => parseInt(p.TOTAL_DAMAGE_DEALT_TO_OBJECTIVES) || 0)),
+            turretDamage: Math.max(...stats.map(p => parseInt(p.TOTAL_DAMAGE_DEALT_TO_TURRETS) || 0)),
+            timeDead: Math.max(...stats.map(p => parseInt(p.TOTAL_TIME_SPENT_DEAD) || 0)),
+        };
+    });
 </script>
 
 {#if storedMatch}
@@ -96,46 +114,161 @@
         {#each ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as position}
         {#each ["100", "200"] as team}
         {#each metadata.statsJson.filter(player => player.TEAM_POSITION === position && player.TEAM == team) as player}
-        <div class="p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
-            <div class="flex items-center mb-4">
-                <img
-                    class="w-12 h-12 rounded-full mr-4"
-                    src={ddragon.getChampionImage(player.SKIN)}
-                    alt="{player.SKIN}"
-                />
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">{@html PlayerService.getPlayerNameWithAsterisk(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME)}</h3>
-                    <p class="text-sm text-gray-500">{player.TEAM_POSITION}</p>
+        <div class="bg-white rounded-xl shadow p-6 flex flex-col min-w-[320px]">
+            <!-- Top Row: Champion, Name, Position, KDA, KP -->
+            <div class="flex items-center mb-2 w-full justify-between">
+                <div class="flex items-center">
+                    <img class="w-10 h-10 rounded-full mr-3" src={ddragon.getChampionImage(player.SKIN)} alt={player.SKIN} />
+                    <div>
+                        <div class="font-bold text-lg text-gray-900">{@html PlayerService.getPlayerNameWithAsterisk(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME)}</div>
+                        <div class="text-xs text-gray-500">{player.TEAM_POSITION}</div>
+                    </div>
+                </div>
+                <div class="flex flex-col items-end text-gray-500">
+                    <span><span class="font-semibold text-gray-700">{player.CHAMPIONS_KILLED}/{player.NUM_DEATHS}/{player.ASSISTS}</span></span>
+                    <span>KP <span class="font-semibold text-gray-700">{calculateKillParticipation(player)}%</span></span>
                 </div>
             </div>
-            <div class="grid grid-cols-2 gap-4 text-sm text-gray-700">
-                <div>
-                    <p><strong>K/D/A:</strong> {player.CHAMPIONS_KILLED}/{player.NUM_DEATHS}/{player.ASSISTS}</p>
-                    <p><strong>Gold Earned:</strong> {formatGold(player.GOLD_EARNED)}</p>
-                    <p><strong>CS:</strong> {formatCs(player)}</p>
-                    <p><strong>Kill Participation:</strong> {calculateKillParticipation(player)}%</p>
-                </div>
-                <div>
-                    <p><strong>Damage Dealt:</strong> {player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS}</p>
-                    <div class="relative w-full h-2 bg-gray-200 rounded mt-1">
+
+            <!-- Items Row -->
+            <div class="flex items-center justify-start gap-1 my-2">
+                {#each [player.ITEM0, player.ITEM1, player.ITEM2, player.ITEM3, player.ITEM4, player.ITEM5, player.ITEM6] as itemId}
+                    <div class="w-8 h-8 rounded bg-gray-100 flex items-center justify-center">
+                        {#if itemId && itemId !== '0'}
+                            <img src={ddragon.getItemImage(itemId)} alt="Item" class="w-full h-full object-cover" />
+                        {/if}
+                    </div>
+                {/each}
+            </div>
+
+            <!-- Runes Row -->
+            <div class="flex items-center justify-start gap-1 mb-2">
+                {#each [player.PERK0, player.PERK1, player.PERK2, player.PERK3, player.PERK4, player.PERK5] as runeId, i}
+                    <img
+                        class="w-6 h-6 rounded-sm"
+                        src={ddragon.getRuneImage(runeId)}
+                        alt="Rune"
+                        style={i === 4 || i === 6 ? 'margin-left:8px;' : ''}
+                    />
+                {/each}
+            </div>
+
+            <!-- Combat Section -->
+            <div class="w-full mt-2">
+                <div class="font-semibold text-gray-800 mb-1">Combat</div>
+                <div class="flex items-center text-sm mt-1">
+                    <span class="mr-2">Damage Dealt: {player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS}</span>
+                    <div class="flex-1 h-1 rounded bg-gray-200 relative">
                         <div
-                            class="absolute top-0 left-0 h-full bg-blue-500 rounded"
-                            style="width: {calculateDamagePercentage(player)}%;"
+                            class="absolute top-0 left-0 h-full rounded"
+                            style="width: {Math.max(5, (parseInt(player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS) / maxStats().damageDealt) * 100)}%; background: {player.TEAM === '100' ? '#3b82f6' : '#ef4444'}"
                         ></div>
                     </div>
-                    <p class="mt-2"><strong>Damage Taken:</strong> {player.TOTAL_DAMAGE_TAKEN}</p>
-                    <p><strong>Healing Done:</strong> {player.TOTAL_HEAL}</p>
+                </div>
+                <div class="flex items-center text-sm mt-1">
+                    <span class="mr-2">Damage Taken: {player.TOTAL_DAMAGE_TAKEN}</span>
+                    <div class="flex-1 h-1 rounded bg-gray-200 relative">
+                        <div
+                            class="absolute top-0 left-0 h-full rounded bg-orange-400"
+                            style="width: {Math.max(5, (parseInt(player.TOTAL_DAMAGE_TAKEN) / maxStats().damageTaken) * 100)}%"
+                        ></div>
+                    </div>
+                </div>
+                <div class="flex items-center text-sm mt-1">
+                    <span class="mr-2">Healing Done: {player.TOTAL_HEAL}</span>
+                    <div class="flex-1 h-1 rounded bg-gray-200 relative">
+                        <div
+                            class="absolute top-0 left-0 h-full rounded bg-green-400"
+                            style="width: {Math.max(5, (parseInt(player.TOTAL_HEAL) / maxStats().healingDone) * 100)}%"
+                        ></div>
+                    </div>
                 </div>
             </div>
-            <div class="mt-4">
-                <h4 class="text-sm font-semibold text-gray-800 mb-2">Objective Stats</h4>
-                <div class="grid grid-cols-2 gap-4 text-sm text-gray-600">
-                    <p><strong>Objective Damage:</strong> {player.TOTAL_DAMAGE_DEALT_TO_OBJECTIVES}</p>
-                    <p><strong>Turret Damage:</strong> {player.TOTAL_DAMAGE_DEALT_TO_TURRETS}</p>
-                    <p><strong>Wards Placed:</strong> {player.WARD_PLACED}</p>
-                    <p><strong>Wards Killed:</strong> {player.WARD_KILLED}</p>
-                    <p><strong>Vision Wards Bought:</strong> {player.VISION_WARDS_BOUGHT_IN_GAME}</p>
-                    <p><strong>Time Spent Dead:</strong> {Math.floor(parseInt(player.TOTAL_TIME_SPENT_DEAD) / 60)}m {parseInt(player.TOTAL_TIME_SPENT_DEAD) % 60}s</p>
+
+            <!-- Economy & CS Section -->
+            <div class="w-full mt-2">
+                <div class="font-semibold text-gray-800 mb-1">Economy & CS</div>
+                <div class="flex items-center text-sm">
+                    <span class="mr-2">Gold Earned: {formatGold(player.GOLD_EARNED)}</span>
+                    <div class="flex-1 h-1 rounded bg-gray-200 relative">
+                        <div
+                            class="absolute top-0 left-0 h-full rounded bg-yellow-400"
+                            style="width: {Math.max(5, (parseInt(player.GOLD_EARNED) / maxStats().gold) * 100)}%"
+                        ></div>
+                    </div>
+                </div>
+                <div class="flex items-center text-sm mt-1">
+                    <span class="mr-2">CS: {formatCs(player)}</span>
+                    <div class="flex-1 h-1 rounded bg-gray-200 relative">
+                        <div
+                            class="absolute top-0 left-0 h-full rounded bg-purple-400"
+                            style="width: {Math.max(5, (formatCs(player) / maxStats().cs) * 100)}%"
+                        ></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vision Section -->
+            <div class="w-full mt-2">
+                <div class="font-semibold text-gray-800 mb-1">Vision</div>
+                <div class="flex items-center text-sm">
+                    <span class="mr-2">Wards Placed: {player.WARD_PLACED}</span>
+                    <div class="flex-1 h-1 rounded bg-gray-200 relative">
+                        <div
+                            class="absolute top-0 left-0 h-full rounded bg-teal-400"
+                            style="width: {Math.max(5, (parseInt(player.WARD_PLACED) / maxStats().wardsPlaced) * 100)}%"
+                        ></div>
+                    </div>
+                </div>
+                <div class="flex items-center text-sm mt-1">
+                    <span class="mr-2">Wards Killed: {player.WARD_KILLED}</span>
+                    <div class="flex-1 h-1 rounded bg-gray-200 relative">
+                        <div
+                            class="absolute top-0 left-0 h-full rounded bg-pink-400"
+                            style="width: {Math.max(5, (parseInt(player.WARD_KILLED) / maxStats().wardsKilled) * 100)}%"
+                        ></div>
+                    </div>
+                </div>
+                <div class="flex items-center text-sm mt-1">
+                    <span class="mr-2">Control Wards: {player.VISION_WARDS_BOUGHT_IN_GAME}</span>
+                    <div class="flex-1 h-1 rounded bg-gray-200 relative">
+                        <div
+                            class="absolute top-0 left-0 h-full rounded bg-indigo-400"
+                            style="width: {Math.max(5, (parseInt(player.VISION_WARDS_BOUGHT_IN_GAME) / maxStats().controlWards) * 100)}%"
+                        ></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Objectives & Misc Section -->
+            <div class="w-full mt-2">
+                <div class="font-semibold text-gray-800 mb-1">Objectives & Misc</div>
+                <div class="flex items-center text-sm">
+                    <span class="mr-2">Objective Damage: {player.TOTAL_DAMAGE_DEALT_TO_OBJECTIVES}</span>
+                    <div class="flex-1 h-1 rounded bg-gray-200 relative">
+                        <div
+                            class="absolute top-0 left-0 h-full rounded bg-slate-400"
+                            style="width: {Math.max(5, (parseInt(player.TOTAL_DAMAGE_DEALT_TO_OBJECTIVES) / maxStats().objDamage) * 100)}%"
+                        ></div>
+                    </div>
+                </div>
+                <div class="flex items-center text-sm mt-1">
+                    <span class="mr-2">Turret Damage: {player.TOTAL_DAMAGE_DEALT_TO_TURRETS}</span>
+                    <div class="flex-1 h-1 rounded bg-gray-200 relative">
+                        <div
+                            class="absolute top-0 left-0 h-full rounded bg-slate-500"
+                            style="width: {Math.max(5, (parseInt(player.TOTAL_DAMAGE_DEALT_TO_TURRETS) / maxStats().turretDamage) * 100)}%"
+                        ></div>
+                    </div>
+                </div>
+                <div class="flex items-center text-sm mt-1">
+                    <span class="mr-2">Time Spent Dead: {Math.floor(parseInt(player.TOTAL_TIME_SPENT_DEAD) / 60)}m {parseInt(player.TOTAL_TIME_SPENT_DEAD) % 60}s</span>
+                    <div class="flex-1 h-1 rounded bg-gray-200 relative">
+                        <div
+                            class="absolute top-0 left-0 h-full rounded bg-gray-400"
+                            style="width: {Math.max(5, (parseInt(player.TOTAL_TIME_SPENT_DEAD) / maxStats().timeDead) * 100)}%"
+                        ></div>
+                    </div>
                 </div>
             </div>
         </div>
