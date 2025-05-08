@@ -1,5 +1,6 @@
 <script lang="ts">
     import DraftDisplay from '$lib/components/draft-display.svelte';
+    import MatchPreview from '$lib/components/match-preview.svelte';
     import type { RoflMetadata, RoflPlayerStats } from '$lib/models/rofl.js';
     import { PlayerService } from '$lib/services/player.js';
 
@@ -17,12 +18,6 @@
         const seconds = Math.floor(gameLength / 1000) % 60;
         return `${minutes}m ${seconds}s`;
     };
-
-    const gameLengthFormatted = $derived.by(() => {
-        const minutes = Math.floor(metadata.gameLength / 1000 / 60);
-        const seconds = Math.floor(metadata.gameLength / 1000) % 60;
-        return `${minutes}m ${seconds}s`;
-    });
 
     const getMatchWinner = (team: string) => {
         return metadata.statsJson.some(player => player.TEAM === team && player.WIN === "Win");
@@ -44,6 +39,16 @@
         const max = Math.max(...metadata.statsJson.map(p => parseInt(p.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS)));
 
         return Math.round((damage / max) * 100)
+    };
+
+    const calculateKillParticipation = (player: RoflPlayerStats) => {
+        const playerKills = parseInt(player.CHAMPIONS_KILLED);
+        const playerAssists = parseInt(player.ASSISTS);
+        const teamKills = metadata.statsJson
+            .filter(p => p.TEAM === player.TEAM)
+            .reduce((acc, p) => acc + parseInt(p.CHAMPIONS_KILLED), 0);
+        
+        return Math.round(((playerKills + playerAssists) / teamKills) * 100);
     };
 </script>
 
@@ -78,198 +83,65 @@
     </div>
 </div>
 
-<div class="grid grid-cols-2 gap-0">
-    <!-- Blue Team -->
-    <div class="bg-blue-50 p-2 rounded-md shadow-sm">
-        <table class="table-auto w-full text-xs text-left">
-            <thead>
-                <tr 
-                    class="bg-blue-200 text-gray-700 font-semibold cursor-pointer"
-                    onclick={() => window.location.href = `/match/${slug}`}
-                >
-                    <th colspan="6" class="px-2 py-1">
-                        {getMatchWinner("100") ? 'Victory' : 'Defeat'} | {gameLengthFormatted}
-                    </th>
-                </tr>
-                <tr class="bg-blue-100 text-gray-500 font-medium">
-                    <th class="px-2 py-1">Player</th>
-                    <th class="px-2 py-1">K/D/A</th>
-                    <th class="px-2 py-1">Gold</th>
-                    <th class="px-2 py-1">Damage</th>
-                    <th class="px-2 py-1">Wards</th>
-                    <th class="px-2 py-1">CS</th>
-                </tr>
-            </thead>
-            <tbody>
-                {#each ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as position}
-                {#each metadata.statsJson.filter(player => player.TEAM === "100" && player.TEAM_POSITION === position) as player}
-                    <tr class="border-b">
-                        <td class="px-2 py-1 flex items-center">
-                            <img
-                                class="w-6 h-6 rounded-sm mr-2"
-                                src={ddragon.getChampionImage(player.SKIN)}
-                                alt="{player.SKIN}"
-                            />
-                            <div class="flex items-center">
-                                <img
-                                    class="w-5 h-5"
-                                    style="margin-bottom: 1px;"
-                                    src={ddragon.getSummonerSpellImage(player.SUMMONER_SPELL_1)}
-                                    alt="Summoner Spell 1"
-                                />
-                                <img
-                                    class="w-5 h-5 mr-2"
-                                    src={ddragon.getSummonerSpellImage(player.SUMMONER_SPELL_2)}
-                                    alt="Summoner Spell 2"
-                                />
-                                <span class="font-medium text-gray-700 truncate">{@html PlayerService.getPlayerNameWithAsterisk(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME)}</span>
-                            </div>
-                        </td>
-                        <td class="px-2 py-1 text-gray-600">{player.CHAMPIONS_KILLED}/{player.NUM_DEATHS}/{player.ASSISTS}</td>
-                        <td class="px-2 py-1 text-gray-600">{formatGold(player.GOLD_EARNED)}</td>
-                        <td class="px-2 py-1 text-gray-600">
-                            {player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS}
-                            <div class="relative w-full h-1 bg-gray-200 rounded mt-1">
-                                <div
-                                    class="absolute top-0 left-0 h-full bg-blue-500 rounded"
-                                    style="width: {calculateDamagePercentage(player)}%;"
-                                ></div>
-                            </div>
-                        </td>
-                        <td class="px-2 py-1 text-gray-600">{player.WARD_PLACED} / {player.WARD_KILLED} / {player.VISION_WARDS_BOUGHT_IN_GAME}</td>
-                        <td class="px-2 py-1 text-gray-600">{formatCs(player)}</td>
-                    </tr>
-                {/each}
-                {/each}
-            </tbody>
-        </table>
+<MatchPreview matchInfo={{ version: match.version, filename: match.filename, gameVersion: match.gameVersion, metadata: metadata, date: new Date(storedMatch.match_date), match_id: storedMatch.match_id }} slug={storedMatch.file_hash} ddragon={ddragon} />
+
+{#if storedMatch.draft_data}
+    <div class="col-span-2 my-4">
+        <DraftDisplay draftState={draft} ddragon={ddragon} />
     </div>
+{/if}
 
-    <!-- Red Team -->
-    <div class="bg-red-50 p-2 rounded-md shadow-sm">
-        <table class="table-auto w-full text-xs text-left">
-            <thead>
-                <tr class="bg-red-200 text-gray-700 font-semibold cursor-pointer"
-                    onclick={() => window.location.href = `/match/${slug}`}
-                >
-                    <th colspan="6" class="px-2 py-1">
-                        {getMatchWinner("200") ? 'Victory' : 'Defeat'} | {gameLengthFormatted}
-                    </th>
-                </tr>
-                <tr class="bg-red-100 text-gray-500 font-medium">
-                    <th class="px-2 py-1">Player</th>
-                    <th class="px-2 py-1">K/D/A</th>
-                    <th class="px-2 py-1">Gold</th>
-                    <th class="px-2 py-1">Damage</th>
-                    <th class="px-2 py-1">Wards</th>
-                    <th class="px-2 py-1">CS</th>
-                </tr>
-            </thead>
-            <tbody>
-                {#each ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as position}
-                {#each metadata.statsJson.filter(player => player.TEAM === "200" && player.TEAM_POSITION === position) as player}
-                    <tr class="border-b">
-                        <td class="px-2 py-1 flex items-center">
-                            <img
-                                class="w-6 h-6 rounded-sm mr-2"
-                                src={ddragon.getChampionImage(player.SKIN)}
-                                alt="{player.SKIN}"
-                            />
-                            <div class="flex items-center">
-                                <img
-                                    class="w-5 h-5"
-                                    style="margin-bottom: 1px;"
-                                    src={ddragon.getSummonerSpellImage(player.SUMMONER_SPELL_1)}
-                                    alt="Summoner Spell 1"
-                                />
-                                <img
-                                    class="w-5 h-5 mr-2"
-                                    src={ddragon.getSummonerSpellImage(player.SUMMONER_SPELL_2)}
-                                    alt="Summoner Spell 2"
-                                />
-                                <span class="font-medium text-gray-700 truncate">{@html PlayerService.getPlayerNameWithAsterisk(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME)}</span>
-                            </div>
-                        </td>
-                        <td class="px-2 py-1 text-gray-600">{player.CHAMPIONS_KILLED}/{player.NUM_DEATHS}/{player.ASSISTS}</td>
-                        <td class="px-2 py-1 text-gray-600">{formatGold(player.GOLD_EARNED)}</td>
-                        <td class="px-2 py-1 text-gray-600">
-                            {player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS}
-                            <div class="relative w-full h-1 bg-gray-200 rounded mt-1">
-                                <div
-                                    class="absolute top-0 left-0 h-full bg-red-500 rounded"
-                                    style="width: {calculateDamagePercentage(player)}%;"
-                                ></div>
-                            </div>
-                        </td>
-                        <td class="px-2 py-1 text-gray-600">{player.WARD_PLACED} / {player.WARD_KILLED} / {player.VISION_WARDS_BOUGHT_IN_GAME}</td>
-                        <td class="px-2 py-1 text-gray-600">{formatCs(player)}</td>
-                    </tr>
-                {/each}
-                {/each}
-            </tbody>
-        </table>
-    </div>
-
-    {#if storedMatch.draft_data}
-        <div class="col-span-2 my-4">
-            <DraftDisplay draftState={draft} ddragon={ddragon} />
-        </div>
-    {/if}
-
-    <div class="col-span-2 mt-4">
-        <div class="grid grid-cols-2 gap-6">
-            {#each ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as position}
-            {#each ["100", "200"] as team}
-            {#each metadata.statsJson.filter(player => player.TEAM_POSITION === position && player.TEAM == team) as player}
-            <div class="p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                <div class="flex items-center mb-4">
-                    <img
-                        class="w-12 h-12 rounded-full mr-4"
-                        src={ddragon.getChampionImage(player.SKIN)}
-                        alt="{player.SKIN}"
-                    />
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-900">{@html PlayerService.getPlayerNameWithAsterisk(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME)}</h3>
-                        <p class="text-sm text-gray-500">{player.TEAM_POSITION}</p>
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4 text-sm text-gray-700">
-                    <div>
-                        <p><strong>K/D/A:</strong> {player.CHAMPIONS_KILLED}/{player.NUM_DEATHS}/{player.ASSISTS}</p>
-                        <p><strong>Gold Earned:</strong> {formatGold(player.GOLD_EARNED)}</p>
-                        <p><strong>CS:</strong> {formatCs(player)}</p>
-                        <p><strong>Kill Participation:</strong> 
-                            {Math.round(((parseInt(player.CHAMPIONS_KILLED) + parseInt(player.ASSISTS)) / metadata.statsJson.reduce((acc, p) => acc + parseInt(p.CHAMPIONS_KILLED), 0)) * 100)}%
-                        </p>
-                    </div>
-                    <div>
-                        <p><strong>Damage Dealt:</strong> {player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS}</p>
-                        <div class="relative w-full h-2 bg-gray-200 rounded mt-1">
-                            <div
-                                class="absolute top-0 left-0 h-full bg-blue-500 rounded"
-                                style="width: {calculateDamagePercentage(player)}%;"
-                            ></div>
-                        </div>
-                        <p class="mt-2"><strong>Damage Taken:</strong> {player.TOTAL_DAMAGE_TAKEN}</p>
-                        <p><strong>Healing Done:</strong> {player.TOTAL_HEAL}</p>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <h4 class="text-sm font-semibold text-gray-800 mb-2">Objective Stats</h4>
-                    <div class="grid grid-cols-2 gap-4 text-sm text-gray-600">
-                        <p><strong>Objective Damage:</strong> {player.TOTAL_DAMAGE_DEALT_TO_OBJECTIVES}</p>
-                        <p><strong>Turret Damage:</strong> {player.TOTAL_DAMAGE_DEALT_TO_TURRETS}</p>
-                        <p><strong>Wards Placed:</strong> {player.WARD_PLACED}</p>
-                        <p><strong>Wards Killed:</strong> {player.WARD_KILLED}</p>
-                        <p><strong>Vision Wards Bought:</strong> {player.VISION_WARDS_BOUGHT_IN_GAME}</p>
-                        <p><strong>Time Spent Dead:</strong> {Math.floor(parseInt(player.TOTAL_TIME_SPENT_DEAD) / 60)}m {parseInt(player.TOTAL_TIME_SPENT_DEAD) % 60}s</p>
-                    </div>
+<div class="col-span-2 mt-4">
+    <div class="grid grid-cols-2 gap-6">
+        {#each ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as position}
+        {#each ["100", "200"] as team}
+        {#each metadata.statsJson.filter(player => player.TEAM_POSITION === position && player.TEAM == team) as player}
+        <div class="p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
+            <div class="flex items-center mb-4">
+                <img
+                    class="w-12 h-12 rounded-full mr-4"
+                    src={ddragon.getChampionImage(player.SKIN)}
+                    alt="{player.SKIN}"
+                />
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">{@html PlayerService.getPlayerNameWithAsterisk(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME)}</h3>
+                    <p class="text-sm text-gray-500">{player.TEAM_POSITION}</p>
                 </div>
             </div>
-            {/each}
-            {/each}
-            {/each}
+            <div class="grid grid-cols-2 gap-4 text-sm text-gray-700">
+                <div>
+                    <p><strong>K/D/A:</strong> {player.CHAMPIONS_KILLED}/{player.NUM_DEATHS}/{player.ASSISTS}</p>
+                    <p><strong>Gold Earned:</strong> {formatGold(player.GOLD_EARNED)}</p>
+                    <p><strong>CS:</strong> {formatCs(player)}</p>
+                    <p><strong>Kill Participation:</strong> {calculateKillParticipation(player)}%</p>
+                </div>
+                <div>
+                    <p><strong>Damage Dealt:</strong> {player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS}</p>
+                    <div class="relative w-full h-2 bg-gray-200 rounded mt-1">
+                        <div
+                            class="absolute top-0 left-0 h-full bg-blue-500 rounded"
+                            style="width: {calculateDamagePercentage(player)}%;"
+                        ></div>
+                    </div>
+                    <p class="mt-2"><strong>Damage Taken:</strong> {player.TOTAL_DAMAGE_TAKEN}</p>
+                    <p><strong>Healing Done:</strong> {player.TOTAL_HEAL}</p>
+                </div>
+            </div>
+            <div class="mt-4">
+                <h4 class="text-sm font-semibold text-gray-800 mb-2">Objective Stats</h4>
+                <div class="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                    <p><strong>Objective Damage:</strong> {player.TOTAL_DAMAGE_DEALT_TO_OBJECTIVES}</p>
+                    <p><strong>Turret Damage:</strong> {player.TOTAL_DAMAGE_DEALT_TO_TURRETS}</p>
+                    <p><strong>Wards Placed:</strong> {player.WARD_PLACED}</p>
+                    <p><strong>Wards Killed:</strong> {player.WARD_KILLED}</p>
+                    <p><strong>Vision Wards Bought:</strong> {player.VISION_WARDS_BOUGHT_IN_GAME}</p>
+                    <p><strong>Time Spent Dead:</strong> {Math.floor(parseInt(player.TOTAL_TIME_SPENT_DEAD) / 60)}m {parseInt(player.TOTAL_TIME_SPENT_DEAD) % 60}s</p>
+                </div>
+            </div>
         </div>
+        {/each}
+        {/each}
+        {/each}
     </div>
 </div>
 {/if}
