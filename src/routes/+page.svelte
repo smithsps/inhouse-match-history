@@ -1,6 +1,7 @@
 <script lang="ts">
     import MatchPreview from '$lib/components/match-preview.svelte';
     import type { Match } from '$lib/models/match';
+    import type { RoflPlayerStats } from '$lib/models/rofl';
     import { PlayerService } from '$lib/services/player';
     import type { PageProps } from './$types';
 
@@ -11,12 +12,11 @@
 
     const filteredMatches = $derived(
         matches.filter(match => {
-            return match.data.metadata.statsJson.some(player => 
-                player.NAME.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                player.RIOT_ID_GAME_NAME.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                PlayerService.getPlayerNameWithAsterisk(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME).toLowerCase().includes(searchQuery.toLowerCase()) ||
-                player.SKIN.toLowerCase().includes(searchQuery.toLowerCase())
-            );
+            return match.data.metadata.statsJson.some((player: RoflPlayerStats) => {
+                const playerName = PlayerService.getPlayerName(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME);
+                return playerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    player.SKIN.toLowerCase().includes(searchQuery.toLowerCase());
+            });
         })
     );
 </script>

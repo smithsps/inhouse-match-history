@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { ROFL, RoflMetadata, RoflPlayerStats } from '$lib/models/rofl';
     import type { DdragongRepository } from '$lib/services/ddragon';
-    import { PlayerService } from '$lib/services/player';
+    import PlayerName from '$lib/components/player-name.svelte';
 
     let {matchInfo, slug, ddragon} = $props<{
         matchInfo: ROFL;
@@ -46,8 +46,8 @@
     };
 
     const teams = $derived.by(() => {
-        const blueTeam = { id: "100", bgColor: "blue", textColor: "blue" };
-        const redTeam = { id: "200", bgColor: "red", textColor: "red" };
+        const blueTeam = { id: "100", bgColor: "bg-blue-50", headerBgColor: "bg-blue-100", titleBgColor: "bg-blue-200", barBgColor: "bg-blue-500" };
+        const redTeam = { id: "200", bgColor: "bg-red-50", headerBgColor: "bg-red-100", titleBgColor: "bg-red-200", barBgColor: "bg-red-500" };
 
         return isMatchWinner(blueTeam.id) ? [blueTeam, redTeam] : [redTeam, blueTeam];
     });
@@ -55,27 +55,27 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
     {#each teams as team}
-        <div class="bg-{team.bgColor}-50 p-2 rounded-md shadow-sm">
+        <div class="{team.bgColor} p-2 rounded-md shadow-sm">
             <div class="w-full text-xs">
                 <div class="grid grid-cols-[auto_auto_auto_auto_auto_auto] gap-0 items-center">
                     {#if slug}
                     <a 
-                        class="bg-{team.bgColor}-200 text-gray-700 font-semibold px-2 py-1 col-span-6"
+                        class="{team.titleBgColor} text-gray-700 font-semibold px-2 py-1 col-span-6"
                         href={slug ? `/match/${slug}` : ''}
                     >
                         {isMatchWinner(team.id) ? 'Victory' : 'Defeat'} | {gameLengthFormatted}
                     </a>
                     {:else}
-                        <div class="bg-{team.bgColor}-200 text-gray-700 font-semibold px-2 py-1 col-span-6">
+                        <div class="{team.titleBgColor} text-gray-700 font-semibold px-2 py-1 col-span-6">
                             {isMatchWinner(team.id) ? 'Victory' : 'Defeat'} | {gameLengthFormatted}
                         </div>
                     {/if}
-                    <div class="bg-{team.bgColor}-100 text-gray-500 font-medium px-2 py-1">Player</div>
-                    <div class="bg-{team.bgColor}-100 text-gray-500 font-medium px-2 py-1">KDA</div>
-                    <div class="bg-{team.bgColor}-100 text-gray-500 font-medium px-2 py-1">Gold</div>
-                    <div class="bg-{team.bgColor}-100 text-gray-500 font-medium px-2 py-1">Damage</div>
-                    <div class="bg-{team.bgColor}-100 text-gray-500 font-medium px-2 py-1">Wards</div>
-                    <div class="bg-{team.bgColor}-100 text-gray-500 font-medium px-2 py-1">CS</div>
+                    <div class="{team.headerBgColor} text-gray-500 font-medium px-2 py-1">Player</div>
+                    <div class="{team.headerBgColor} text-gray-500 font-medium px-2 py-1">KDA</div>
+                    <div class="{team.headerBgColor} text-gray-500 font-medium px-2 py-1">Gold</div>
+                    <div class="{team.headerBgColor} text-gray-500 font-medium px-2 py-1">Damage</div>
+                    <div class="{team.headerBgColor} text-gray-500 font-medium px-2 py-1">Wards</div>
+                    <div class="{team.headerBgColor} text-gray-500 font-medium px-2 py-1">CS</div>
                     
                     {#each ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as position}
                         {#each match.statsJson.filter(player => player.TEAM === team.id && player.TEAM_POSITION === position) as player}
@@ -97,7 +97,7 @@
                                         src={ddragon.getSummonerSpellImage(player.SUMMONER_SPELL_2)}
                                         alt="Summoner Spell 2"
                                     />
-                                    <span class="font-medium text-gray-700 truncate">{@html PlayerService.getPlayerNameWithAsterisk(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME)}</span>
+                                    <PlayerName puuid={player.PUUID} name={player.RIOT_ID_GAME_NAME || player.NAME} />
                                 </div>
                             </div>
                             <div class="px-2 py-1 text-gray-600">{player.CHAMPIONS_KILLED}/{player.NUM_DEATHS}/{player.ASSISTS}</div>
@@ -106,7 +106,7 @@
                                 {player.TOTAL_DAMAGE_DEALT_TO_CHAMPIONS}
                                 <div class="relative w-full h-1 bg-gray-200 rounded">
                                     <div
-                                        class="absolute top-0 left-0 h-full bg-{team.bgColor}-500 rounded"
+                                        class="absolute top-0 left-0 h-full {team.barBgColor} rounded"
                                         style="width: {calculateDamagePercentage(player)}%;"
                                     ></div>
                                 </div>

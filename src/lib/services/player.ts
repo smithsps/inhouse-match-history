@@ -1,4 +1,3 @@
-
 enum PUUIDS {
     DefNotSion = "6104470e-797d-5667-80ff-4c73cd819370",
     Sivrag9000 = "7eded1bf-389c-57db-9f75-4e6ddebbce84",
@@ -25,17 +24,6 @@ export class PlayerService {
         }
 
         return puuid;
-    }
-
-    static getPlayerNameWithAsterisk(puuid: string, playerName: string) {
-        if (PLAYER_MAP[puuid] && PLAYER_NAMES[PLAYER_MAP[puuid]]) {
-            const altPlayerPuuid = PLAYER_MAP[puuid];
-            const altPlayerName = PLAYER_NAMES[altPlayerPuuid];
-            
-            return `${playerName}<span title="${playerName} is an alt of ${altPlayerName}">*</span>`;
-        }
-
-        return playerName;
     }
 
     static getPlayerName(puuid: string, playerName: string) {

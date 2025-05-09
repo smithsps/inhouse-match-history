@@ -1,6 +1,7 @@
 <script lang="ts">
     import DraftDisplay from '$lib/components/draft-display.svelte';
     import MatchPreview from '$lib/components/match-preview.svelte';
+    import PlayerName from '$lib/components/player-name.svelte';
     import type { RoflMetadata, RoflPlayerStats } from '$lib/models/rofl.js';
     import { PlayerService } from '$lib/services/player.js';
 
@@ -120,7 +121,7 @@
                 <div class="flex items-center">
                     <img class="w-10 h-10 rounded-full mr-3" src={ddragon.getChampionImage(player.SKIN)} alt={player.SKIN} />
                     <div>
-                        <div class="font-bold text-lg text-gray-900">{@html PlayerService.getPlayerNameWithAsterisk(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME)}</div>
+                        <PlayerName puuid={player.PUUID} name={player.RIOT_ID_GAME_NAME || player.NAME} />
                         <div class="text-xs text-gray-500">{player.TEAM_POSITION}</div>
                     </div>
                 </div>
