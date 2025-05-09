@@ -69,6 +69,39 @@
             timeDead: Math.max(...stats.map(p => parseInt(p.TOTAL_TIME_SPENT_DEAD) || 0)),
         };
     });
+
+    // Compute max values for team stats for bar scaling
+    const teamStatsMax = {
+        towers: Math.max(
+            ...["100", "200"].map(team => metadata.statsJson.filter(p => p.TEAM === team).reduce((acc, p) => acc + parseInt(p.TURRETS_KILLED), 0))
+        ),
+        dragons: Math.max(
+            ...["100", "200"].map(team => metadata.statsJson.filter(p => p.TEAM === team).reduce((acc, p) => acc + parseInt(p.DRAGON_KILLS), 0))
+        ),
+        barons: Math.max(
+            ...["100", "200"].map(team => metadata.statsJson.filter(p => p.TEAM === team).reduce((acc, p) => acc + parseInt(p.BARON_KILLS), 0))
+        ),
+        herald: Math.max(
+            ...["100", "200"].map(team => metadata.statsJson.filter(p => p.TEAM === team).reduce((acc, p) => acc + parseInt(p.RIFT_HERALD_KILLS), 0))
+        ),
+        atakhan: Math.max(
+            ...["100", "200"].map(team => metadata.statsJson.filter(p => p.TEAM === team).reduce((acc, p) => acc + parseInt(p.ATAKHAN_KILLS), 0))
+        ),
+        grubs: Math.max(
+            ...["100", "200"].map(team => metadata.statsJson.filter(p => p.TEAM === team).reduce((acc, p) => acc + parseInt(p.HORDE_KILLS), 0))
+        ),
+        gold: Math.max(
+            ...["100", "200"].map(team => metadata.statsJson.filter(p => p.TEAM === team).reduce((acc, p) => acc + parseInt(p.GOLD_EARNED), 0))
+        ),
+        kills: Math.max(
+            ...["100", "200"].map(team => metadata.statsJson.filter(p => p.TEAM === team).reduce((acc, p) => acc + parseInt(p.CHAMPIONS_KILLED), 0))
+        ),
+    };
+
+    // Helper to get team stat value
+    function getTeamStat(team: string, key: keyof RoflPlayerStats): number {
+        return metadata.statsJson.filter(p => p.TEAM === team).reduce((acc, p) => acc + parseInt((p[key] ?? '0') as string), 0);
+    }
 </script>
 
 {#if storedMatch}
@@ -109,6 +142,71 @@
         <DraftDisplay draftState={draft} ddragon={ddragon} />
     </div>
 {/if}
+
+<!-- Team Statistics Section -->
+<div class="col-span-2 mt-4 mb-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {#each ["100", "200"] as team}
+      <div class="bg-white rounded-xl shadow p-6 flex flex-col">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-lg font-semibold {team === '100' ? 'text-blue-700' : 'text-red-700'}">
+            {team === "100" ? "Blue Team" : "Red Team"}
+          </h3>
+          <span class="text-sm font-semibold {team === '100' ? 'text-blue-500' : 'text-red-500'}">
+            {getMatchWinner(team) ? "Victory" : "Defeat"}
+          </span>
+        </div>
+        <div class="grid grid-cols-2 gap-x-6 gap-y-1 mt-2">
+          {#each [
+            { label: 'Towers', key: 'TURRETS_KILLED', max: teamStatsMax.towers },
+            { label: 'Dragons', key: 'DRAGON_KILLS', max: teamStatsMax.dragons },
+            { label: 'Barons', key: 'BARON_KILLS', max: teamStatsMax.barons },
+            { label: 'Rift Herald', key: 'RIFT_HERALD_KILLS', max: teamStatsMax.herald },
+            { label: 'Atakhan', key: 'ATAKHAN_KILLS', max: teamStatsMax.atakhan },
+            { label: 'Void Grubs', key: 'HORDE_KILLS', max: teamStatsMax.grubs },
+          ] as stat}
+            <div class="text-sm text-gray-600">{stat.label}</div>
+            <div class="flex items-center gap-2">
+              <div class="relative flex-1 h-2 bg-gray-200 rounded">
+                <div
+                  class="absolute top-0 left-0 h-2 rounded"
+                  style="width: {stat.max > 0 ? Math.max(8, (getTeamStat(team, stat.key as keyof RoflPlayerStats) / stat.max) * 100) : 0}%; background: {team === '100' ? '#3b82f6' : '#ef4444'}"
+                  aria-label="{stat.label} bar"
+                  title={getTeamStat(team, stat.key as keyof RoflPlayerStats).toString()}
+                ></div>
+              </div>
+              <div class="text-sm text-gray-900 text-right w-8">{getTeamStat(team, stat.key as keyof RoflPlayerStats)}</div>
+            </div>
+          {/each}
+          <div class="text-sm text-gray-600">Total Gold</div>
+          <div class="flex items-center gap-2">
+            <div class="relative flex-1 h-2 bg-gray-200 rounded">
+              <div
+                class="absolute top-0 left-0 h-2 rounded"
+                style="width: {teamStatsMax.gold > 0 ? Math.max(8, (getTeamStat(team, 'GOLD_EARNED') / teamStatsMax.gold) * 100) : 0}%; background: {team === '100' ? '#3b82f6' : '#ef4444'}"
+                aria-label="Total Gold bar"
+                title={formatGold(getTeamStat(team, 'GOLD_EARNED').toString())}
+              ></div>
+            </div>
+            <div class="text-sm text-gray-900 text-right w-12">{formatGold(getTeamStat(team, 'GOLD_EARNED').toString())}</div>
+          </div>
+          <div class="text-sm text-gray-600">Total Kills</div>
+          <div class="flex items-center gap-2">
+            <div class="relative flex-1 h-2 bg-gray-200 rounded">
+              <div
+                class="absolute top-0 left-0 h-2 rounded"
+                style="width: {teamStatsMax.kills > 0 ? Math.max(8, (getTeamStat(team, 'CHAMPIONS_KILLED') / teamStatsMax.kills) * 100) : 0}%; background: {team === '100' ? '#3b82f6' : '#ef4444'}"
+                aria-label="Total Kills bar"
+                title={getTeamStat(team, 'CHAMPIONS_KILLED').toString()}
+              ></div>
+            </div>
+            <div class="text-sm text-gray-900 text-right w-8">{getTeamStat(team, 'CHAMPIONS_KILLED')}</div>
+          </div>
+        </div>
+      </div>
+    {/each}
+  </div>
+</div>
 
 <div class="col-span-2 mt-4">
     <div class="grid grid-cols-2 gap-6">

@@ -54,7 +54,7 @@
                 {/if}
             </div>
         </a>
-        <MatchPreview matchInfo={match.data} slug={match.file_hash} ddragon={data.ddragon} />
+        <MatchPreview matchInfo={match.data} slug={match.file_hash} ddragon={data.ddragon} sortByWinner={true} showLink={true} />
     </div>
     {/each}
 </div>

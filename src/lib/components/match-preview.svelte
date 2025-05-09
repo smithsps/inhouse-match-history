@@ -3,10 +3,12 @@
     import type { DdragongRepository } from '$lib/services/ddragon';
     import PlayerName from '$lib/components/player-name.svelte';
 
-    let {matchInfo, slug, ddragon} = $props<{
+    let {matchInfo, slug, ddragon, sortByWinner = false, showLink = false} = $props<{
         matchInfo: ROFL;
         slug: string | null;
         ddragon: DdragongRepository;
+        sortByWinner?: boolean;
+        showLink?: boolean;
     }>();
 
     let match: RoflMetadata = $derived(matchInfo.metadata);
@@ -49,6 +51,10 @@
         const blueTeam = { id: "100", bgColor: "bg-blue-50", headerBgColor: "bg-blue-100", titleBgColor: "bg-blue-200", barBgColor: "bg-blue-500" };
         const redTeam = { id: "200", bgColor: "bg-red-50", headerBgColor: "bg-red-100", titleBgColor: "bg-red-200", barBgColor: "bg-red-500" };
 
+        if (!sortByWinner) {
+            return [blueTeam, redTeam];
+        }
+        
         return isMatchWinner(blueTeam.id) ? [blueTeam, redTeam] : [redTeam, blueTeam];
     });
 </script>
@@ -58,7 +64,7 @@
         <div class="{team.bgColor} p-2 rounded-md shadow-sm">
             <div class="w-full text-xs">
                 <div class="grid grid-cols-[auto_auto_auto_auto_auto_auto] gap-0 items-center">
-                    {#if slug}
+                    {#if showLink}
                     <a 
                         class="{team.titleBgColor} text-gray-700 font-semibold px-2 py-1 col-span-6"
                         href={slug ? `/match/${slug}` : ''}
