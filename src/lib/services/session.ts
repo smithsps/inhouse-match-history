@@ -67,7 +67,7 @@ export class SessionService {
         if (Date.now() >= session.expires_at.getTime() - 1000 * 60 * 60 * 24 * 15) {
             session.expires_at = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
             await this.db.prepare(
-                "UPDATE session SET expires_at = ? WHERE id = ?"
+                "UPDATE sessions SET expires_at = ? WHERE id = ?"
             )
             .bind(
                 Math.floor(session.expires_at.getTime() / 1000),
