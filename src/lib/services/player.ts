@@ -26,7 +26,7 @@ export class PlayerService {
         return puuid;
     }
 
-    static getPlayerName(puuid: string, playerName: string) {
+    static getPlayerNameOrDefault(puuid: string, playerName: string) {
         if (PLAYER_MAP[puuid] && PLAYER_NAMES[PLAYER_MAP[puuid]]) {
             return PLAYER_NAMES[PLAYER_MAP[puuid]];
         }

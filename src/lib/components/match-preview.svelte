@@ -103,7 +103,9 @@
                                         src={ddragon.getSummonerSpellImage(player.SUMMONER_SPELL_2)}
                                         alt="Summoner Spell 2"
                                     />
-                                    <PlayerName puuid={player.PUUID} name={player.RIOT_ID_GAME_NAME || player.NAME} />
+                                    <a href="/player/{player.PUUID}" class="hover:underline">
+                                        <PlayerName puuid={player.PUUID} name={player.RIOT_ID_GAME_NAME || player.NAME} />
+                                    </a>
                                 </div>
                             </div>
                             <div class="px-2 py-1 text-gray-600">{player.CHAMPIONS_KILLED}/{player.NUM_DEATHS}/{player.ASSISTS}</div>

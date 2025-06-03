@@ -7,14 +7,14 @@
     }>();
 
     const altName = $derived.by(() => {
-        return PlayerService.getPlayerName(puuid, name);
+        return PlayerService.getPlayerNameOrDefault(puuid, name);
     });
 </script>
 
-<div class="font-medium text-gray-700 truncate">
+<span class="font-medium text-gray-700 truncate">
     {#if altName !== name}
         <span title="{name} is an alt of {altName}">{name}*</span>
     {:else}
         {name}
     {/if}
-</div> 
+</span> 

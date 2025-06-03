@@ -88,7 +88,7 @@ async function getLeaderboard(platform: Readonly<App.Platform>): Promise<Leaderb
                 players.set(playerid, {
                     id: playerid,
                     rank: -1,
-                    name: PlayerService.getPlayerName(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME),
+                    name: PlayerService.getPlayerNameOrDefault(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME),
                     wins: 0,
                     losses: 0,
                     matchResults: [],

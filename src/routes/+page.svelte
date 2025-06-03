@@ -13,7 +13,7 @@
     const filteredMatches = $derived(
         matches.filter(match => {
             return match.data.metadata.statsJson.some((player: RoflPlayerStats) => {
-                const playerName = PlayerService.getPlayerName(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME);
+                const playerName = PlayerService.getPlayerNameOrDefault(player.PUUID, player.RIOT_ID_GAME_NAME || player.NAME);
                 return playerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                     player.SKIN.toLowerCase().includes(searchQuery.toLowerCase());
             });
