@@ -89,7 +89,7 @@
 
     let sortedChampions = $derived([...championsArray].sort(sortChampions));
 
-    function setSort(key: string) {
+    function setSort(key: typeof championSortKey) {
         if (championSortKey === key) {
             championSortDir = championSortDir === 'asc' ? 'desc' : 'asc';
         } else {
@@ -386,6 +386,9 @@
             {:else if activeTab === 'synergy'}
                 <!-- Synergy Table -->
                 <div class="overflow-x-auto">
+                    <div class="text-xs text-gray-500 italic mb-2">
+                        Statistics when on the same team of {player.name}
+                    </div>
                     <table class="min-w-full divide-y divide-gray-200 text-xs">
                         <thead class="bg-gray-50">
                             <tr>
@@ -399,7 +402,11 @@
                         <tbody class="bg-white divide-y divide-gray-100">
                             {#each sortedSynergy as s}
                                 <tr>
-                                    <td class="px-2 py-2"><PlayerName puuid={s.puuid} name={s.name} /></td>
+                                    <td class="px-2 py-2">
+                                        <a href={`/player/${s.puuid}`} class="hover:underline text-blue-700">
+                                            <PlayerName puuid={s.puuid} name={s.name} />
+                                        </a>
+                                    </td>
                                     <td class="px-2 py-2 text-center">{s.games}</td>
                                     <td class="px-2 py-2 text-center">{s.wins}</td>
                                     <td class="px-2 py-2 text-center">{s.losses}</td>
@@ -412,6 +419,9 @@
             {:else if activeTab === 'villains'}
                 <!-- Villains Table -->
                 <div class="overflow-x-auto">
+                    <div class="text-xs text-gray-500 italic mb-2">
+                        Statistics when on the opposite team of {player.name}
+                    </div>
                     <table class="min-w-full divide-y divide-gray-200 text-xs">
                         <thead class="bg-gray-50">
                             <tr>
@@ -425,7 +435,11 @@
                         <tbody class="bg-white divide-y divide-gray-100">
                             {#each sortedVillains as v}
                                 <tr>
-                                    <td class="px-2 py-2"><PlayerName puuid={v.puuid} name={v.name} /></td>
+                                    <td class="px-2 py-2">
+                                        <a href={`/player/${v.puuid}`} class="hover:underline text-blue-700">
+                                            <PlayerName puuid={v.puuid} name={v.name} />
+                                        </a>
+                                    </td>
                                     <td class="px-2 py-2 text-center">{v.games}</td>
                                     <td class="px-2 py-2 text-center">{v.wins}</td>
                                     <td class="px-2 py-2 text-center">{v.losses}</td>
